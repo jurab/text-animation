@@ -40,15 +40,6 @@
             position: absolute;
             display: inline-block;
         }
-        .debug {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            color: #666;
-            font-size: 14px;
-            font-family: monospace;
-            z-index: 100;
-        }
     </style>
 </head>
 <body>
@@ -70,10 +61,6 @@
     <div class="line"><span class="text">figures obscured by mist and vapour,</span></div>
     <div class="line"><span class="text">suspended on webs of their own.</span></div>
     
-    <div class="debug">
-        <div>scroll: <span id="dbg-scroll">0</span></div>
-        <div>progress: <span id="dbg-progress">0</span></div>
-    </div>
 
     <script>
     (function() {
@@ -188,9 +175,6 @@
             const scrollY = window.scrollY;
             const maxScroll = document.body.scrollHeight - window.innerHeight;
             const scrollProgress = scrollY / maxScroll;
-            
-            document.getElementById('dbg-scroll').textContent = Math.round(scrollY);
-            document.getElementById('dbg-progress').textContent = scrollProgress.toFixed(3);
             
             const viewportH = window.innerHeight;
             

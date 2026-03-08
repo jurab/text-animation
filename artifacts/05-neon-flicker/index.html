@@ -61,23 +61,9 @@
       width: 0.3em;
     }
 
-    /* Debug info */
-    .debug {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      font-family: monospace;
-      font-size: 14px;
-      color: #666;
-    }
   </style>
 </head>
 <body>
-  <div class="debug">
-    <div>scroll: <span id="scroll-val">0</span></div>
-    <div>word: <span id="word-val">0</span></div>
-    <div>active: <span id="active-val">0</span></div>
-  </div>
 
   <div class="container" id="text-container"></div>
 
@@ -182,11 +168,6 @@
 
         word.active = isActive;
       });
-
-      // Update debug
-      document.getElementById('scroll-val').textContent = scrollProgress.toFixed(3);
-      document.getElementById('word-val').textContent = center.toFixed(2);
-      document.getElementById('active-val').textContent = words.filter(w => w.active).length + '/' + words.length;
 
       requestAnimationFrame(animate);
     }

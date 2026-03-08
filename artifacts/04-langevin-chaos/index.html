@@ -93,74 +93,12 @@
             opacity: 0;
         }
 
-        .debug {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            color: #666;
-            font-family: monospace;
-            font-size: 12px;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .wells-indicator {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-        }
-
-        .well-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #333;
-            transition: background 0.3s;
-        }
-
-        .well-dot.active {
-            background: #6a8;
-        }
-
-        .well-dot.clickable {
-            cursor: pointer;
-        }
-
-        .well-dot.clickable:hover {
-            background: #8ac;
-        }
-
-        .well-dot.ordered {
-            background: #c86;
-        }
-
-        .next-meter {
-            width: 40px;
-            height: 6px;
-            background: #222;
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .next-meter-fill {
-            height: 100%;
-            background: #6a8;
-            width: 0%;
-            transition: width 0.1s;
-        }
     </style>
 </head>
 <body>
     <div class="scroll-container"></div>
     <canvas id="wells" style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:0;"></canvas>
     <div class="text-container" id="container"></div>
-    <div class="debug" id="debug">
-        <div class="wells-indicator" id="wells-indicator"></div>
-        <div class="next-meter"><div class="next-meter-fill" id="next-meter-fill"></div></div>
-        <span id="debug-text"></span>
-    </div>
 
     <script>
         // === WORD CONFIGURATION ===
@@ -560,54 +498,6 @@
             // Letters start at their target positions - thermal noise will scatter them
             // No manual scatter needed, the physics does it naturally
 
-            // Create well indicator dots and clickable word areas
-            const indicator = document.getElementById('wells-indicator');
-            const container = document.getElementById('container');
-
-            words.forEach((word, i) => {
-                // Dot in status bar
-                const dot = document.createElement('div');
-                dot.className = 'well-dot';
-                dot.id = `well-dot-${i}`;
-                dot.title = word.letters.map(l => l.char).join('');
-                indicator.appendChild(dot);
-
-                // Clickable area over word in main view
-                if (DEBUG_WELLS) {
-                    const clickArea = document.createElement('div');
-                    clickArea.className = 'word-clickable';
-                    clickArea.id = `word-click-${i}`;
-
-                    // Position based on word bounds
-                    const firstLetter = word.letters[0];
-                    const lastLetter = word.letters[word.letters.length - 1];
-                    const wordWidth = (lastLetter.targetX - firstLetter.targetX) + 20;
-
-                    clickArea.style.left = `${firstLetter.targetX - 5}px`;
-                    clickArea.style.top = `${firstLetter.targetY - 10}px`;
-                    clickArea.style.width = `${wordWidth}px`;
-                    clickArea.style.height = '40px';
-
-                    clickArea.addEventListener('click', () => {
-                        if (customOrder.includes(i)) return;
-                        customOrder.push(i);
-                        clickArea.classList.add('ordered');
-                        dot.classList.add('ordered');
-
-                        const wordText = word.letters.map(l => l.char).join('');
-                        console.log(`Order: [${customOrder.join(', ')}] - added "${wordText}" at position ${customOrder.length}`);
-
-                        if (customOrder.length === words.length) {
-                            console.log('\n=== FINAL ORDER ===');
-                            console.log(`const WORD_ORDER = [${customOrder.join(', ')}];`);
-                            console.log('Words:', customOrder.map(idx => words[idx].letters.map(l => l.char).join('')).join(' → '));
-                        }
-                    });
-
-                    container.appendChild(clickArea);
-                }
-            });
-
             function animate(timestamp) {
                 if (!startTime) startTime = timestamp;
                 frameCount++;
@@ -656,31 +546,6 @@
                         });
                     }
                 });
-
-                // Update well indicator dots
-                words.forEach((word, i) => {
-                    const dot = document.getElementById(`well-dot-${i}`);
-                    const active = scrollProgress >= word.activationScroll;
-                    dot.classList.toggle('active', active);
-                });
-
-                // Update next activation meter
-                const sortedByActivation = [...words].sort((a, b) => a.activationScroll - b.activationScroll);
-                const nextWord = sortedByActivation.find(w => scrollProgress < w.activationScroll);
-                const prevWord = sortedByActivation.filter(w => scrollProgress >= w.activationScroll).pop();
-                const prevActivation = prevWord ? prevWord.activationScroll : 0;
-
-                if (nextWord) {
-                    const progress = (scrollProgress - prevActivation) / (nextWord.activationScroll - prevActivation);
-                    document.getElementById('next-meter-fill').style.width = `${Math.max(0, Math.min(100, progress * 100))}%`;
-                } else {
-                    document.getElementById('next-meter-fill').style.width = '100%';
-                }
-
-                // Debug
-                const avgKE = letters.reduce((sum, l) => sum + l.kineticEnergy, 0) / letters.length;
-                document.getElementById('debug-text').textContent =
-                    `T: ${temperature.toFixed(3)} | scroll: ${(scrollProgress * 100).toFixed(1)}%`;
 
                 requestAnimationFrame(animate);
             }

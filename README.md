@@ -11,7 +11,6 @@ Physics-driven text animations. Each piece uses a different simulation technique
 | 03 | Crystallization | Orbital motion → crystal formation |
 | 04 | Langevin Chaos | Thermal noise, per-word gravity wells |
 | 05 | Neon Flicker | Gaussian probability window, word-level flicker |
-| 06 | Psychedelic | SVG renderer with scroll transitions |
 | 07 | Pixel Letters | Canvas pixel extraction, scatter/reveal |
 | 08 | Text Morph | LCS-based pixel matching, Langevin interpolation |
 | 09 | Thread | Letter drop with Verlet integration |

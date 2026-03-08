@@ -16,10 +16,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     html, body {
-      height: 100%;
-      overflow: hidden;
-      position: fixed;
-      width: 100%;
+      min-height: 500vh;
       background: #000;
       font-family: 'ADolphin', Georgia, serif;
       color: #e8e4d9;
@@ -50,438 +47,15 @@
       font-size: 28px;
       pointer-events: none;
     }
-
-    .debug {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      color: #666;
-      font-family: monospace;
-      font-size: 12px;
-      z-index: 1000;
-    }
-
-    .hint {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      color: #333;
-      font-size: 12px;
-      transition: opacity 0.5s;
-    }
-
-    .lang-switch {
-      position: fixed;
-      left: 10px;
-      top: 28px;
-      display: flex;
-      gap: 4px;
-      z-index: 1000;
-    }
-
-    .lang-btn {
-      background: transparent;
-      border: 1px solid #333;
-      color: #555;
-      font-size: 10px;
-      padding: 2px 6px;
-      cursor: pointer;
-      font-family: monospace;
-      transition: all 0.2s;
-    }
-
-    .lang-btn:hover {
-      color: #888;
-      border-color: #555;
-    }
-
-    .lang-btn.active {
-      color: #e8e4d9;
-      border-color: #e8e4d9;
-    }
-
-    .line-nav {
-      position: fixed;
-      left: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      z-index: 1000;
-    }
-
-    .line-nav-item {
-      font-size: 9px;
-      color: #333;
-      cursor: pointer;
-      padding: 2px 4px;
-      transition: color 0.2s;
-    }
-
-    .line-nav-item:hover {
-      color: #666;
-    }
-
-    .line-nav-item.active {
-      color: #e8e4d9;
-    }
-
-    .controls {
-      position: fixed;
-      right: 10px;
-      top: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      z-index: 1000;
-      font-family: monospace;
-      font-size: 9px;
-      color: #444;
-    }
-
-    .control-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .control-row label {
-      width: 50px;
-      text-align: right;
-    }
-
-    .control-row input[type="range"] {
-      width: 160px;
-      height: 4px;
-      -webkit-appearance: none;
-      background: #222;
-      outline: none;
-    }
-
-    .control-row input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 8px;
-      height: 8px;
-      background: #666;
-      cursor: pointer;
-    }
-
-    .control-row .value {
-      width: 30px;
-      color: #555;
-    }
-
-    .timeline-panel {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 195px;
-      background: #111;
-      border-top: 1px solid #333;
-      display: flex;
-      flex-direction: column;
-      z-index: 1001;
-    }
-
-    .timeline-toolbar {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 6px 10px;
-      border-bottom: 1px solid #222;
-    }
-
-    .transport-controls {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .play-btn {
-      background: #222;
-      border: 1px solid #444;
-      color: #e8e4d9;
-      width: 32px;
-      height: 24px;
-      cursor: pointer;
-      font-size: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .play-btn:hover {
-      background: #333;
-    }
-
-    .time-display {
-      font-family: monospace;
-      font-size: 11px;
-      color: #888;
-      min-width: 40px;
-    }
-
-    .bpm-controls {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .bpm-group {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .bpm-group label {
-      font-family: monospace;
-      font-size: 9px;
-      color: #555;
-    }
-
-    .bpm-input {
-      width: 44px;
-      background: #1a1a1a;
-      border: 1px solid #333;
-      color: #e8e4d9;
-      font-family: monospace;
-      font-size: 11px;
-      padding: 2px 4px;
-      text-align: center;
-    }
-
-    .bpm-input:focus {
-      outline: none;
-      border-color: #555;
-    }
-
-    .tap-btn {
-      background: #222;
-      border: 1px solid #333;
-      color: #666;
-      font-size: 9px;
-      padding: 2px 6px;
-      cursor: pointer;
-    }
-
-    .tap-btn:hover {
-      background: #333;
-      color: #e8e4d9;
-    }
-
-    .gap-slider {
-      width: 60px;
-      height: 4px;
-      -webkit-appearance: none;
-      appearance: none;
-      background: #333;
-      border-radius: 2px;
-      cursor: pointer;
-    }
-
-    .gap-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 10px;
-      height: 10px;
-      background: #666;
-      border-radius: 50%;
-    }
-
-    .gap-slider::-webkit-slider-thumb:hover {
-      background: #888;
-    }
-
-    .toolbar-spacer {
-      flex: 1;
-    }
-
-    .segment-duration {
-      font-family: monospace;
-      font-size: 11px;
-      color: #6a6;
-    }
-
-    .timeline-tracks {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      position: relative;
-      padding: 4px 10px 8px;
-      overflow: hidden;
-      min-height: 0;
-    }
-
-    .track {
-      position: relative;
-      cursor: crosshair;
-    }
-
-    .track-transitions {
-      height: 28px;
-    }
-
-    .track-overdrives {
-      height: 24px;
-    }
-
-    .track-silences {
-      height: 24px;
-    }
-
-    .track-segment {
-      height: 20px;
-    }
-
-    .track-waveform {
-      flex: 1;
-      min-height: 0;
-      cursor: grab;
-      overflow: hidden;
-    }
-
-    .track canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-
-    .track-label {
-      position: absolute;
-      left: 4px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-family: monospace;
-      font-size: 8px;
-      color: #444;
-      pointer-events: none;
-    }
-
-    #playheadLine {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      background: #e8e4d9;
-      pointer-events: none;
-      z-index: 10;
-    }
-
-    #beatIndicator {
-      position: absolute;
-      top: -40px;
-      left: 0;
-      transform: translateX(-50%);
-      font-family: monospace;
-      font-size: 24px;
-      font-weight: bold;
-      color: rgb(80, 180, 220);
-      text-shadow: 0 0 10px rgba(80, 180, 220, 0.8);
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.1s;
-      z-index: 100;
-    }
-
-    #beatIndicator.visible {
-      opacity: 1;
-    }
-
   </style>
 </head>
 <body>
   <div class="container" id="container"></div>
   <div class="anchor" id="anchor">Strach</div>
-  <div class="lang-switch" id="langSwitch">
-    <button class="lang-btn active" data-lang="cz">cz</button>
-    <button class="lang-btn" data-lang="en">en</button>
-  </div>
-  <div class="line-nav" id="lineNav"></div>
-  <div class="debug" id="debug">line: 0 | word: 0</div>
-  <div class="hint" id="hint">← → | ⏎ sync | ␣ OD</div>
-  <div class="controls" id="controls">
-    <div class="control-row">
-      <label>freq</label>
-      <input type="range" id="glitchFreq" min="0" max="200" value="100">
-      <span class="value" id="glitchFreqVal">100%</span>
-    </div>
-    <div class="control-row">
-      <label>pos</label>
-      <input type="range" id="glitchPos" min="0" max="100" value="50">
-      <span class="value" id="glitchPosVal">50</span>
-    </div>
-    <div class="control-row">
-      <label>opacity</label>
-      <input type="range" id="glitchOpacity" min="0" max="128" value="64">
-      <span class="value" id="glitchOpacityVal">64</span>
-    </div>
-    <div class="control-row">
-      <label>tear</label>
-      <input type="range" id="glitchTear" min="0" max="200" value="100">
-      <span class="value" id="glitchTearVal">100</span>
-    </div>
-    <div class="control-row">
-      <label>OD</label>
-      <input type="range" id="glitchOD" min="1" max="7" value="4">
-      <span class="value" id="glitchODVal">4x</span>
-    </div>
-  </div>
-
-  <div class="timeline-panel" id="timelinePanel">
-    <div class="timeline-toolbar">
-      <div class="transport-controls">
-        <button class="play-btn" id="playBtn">▶</button>
-        <div class="time-display" id="timeDisplay">0:00</div>
-      </div>
-      <div class="bpm-controls">
-        <div class="bpm-group">
-          <label>bpm</label>
-          <input type="number" class="bpm-input" id="bpmInput" value="153" min="60" max="240">
-        </div>
-        <div class="bpm-group">
-          <label>offset</label>
-          <input type="number" class="bpm-input" id="offsetInput" value="0" min="0" step="0.01">
-          <button class="tap-btn" id="tapOffsetBtn">tap</button>
-        </div>
-        <div class="bpm-group">
-          <label>gap</label>
-          <input type="range" class="gap-slider" id="gapSlider" min="0" max="100" value="0">
-        </div>
-      </div>
-      <div class="toolbar-spacer"></div>
-      <div class="segment-duration" id="segmentDuration">0:00</div>
-    </div>
-    <div class="timeline-tracks" id="timelineTracks">
-      <div class="track track-transitions" id="transitionsTrack">
-        <canvas id="transitionsCanvas"></canvas>
-        <span class="track-label">trans</span>
-      </div>
-      <div class="track track-overdrives" id="overdrivesTrack">
-        <canvas id="overdrivesCanvas"></canvas>
-        <span class="track-label">OD</span>
-      </div>
-      <div class="track track-silences" id="silencesTrack">
-        <canvas id="silencesCanvas"></canvas>
-        <span class="track-label">mute</span>
-      </div>
-      <div class="track track-segment" id="segmentTrack">
-        <canvas id="segmentCanvas"></canvas>
-        <span class="track-label">seg</span>
-      </div>
-      <div class="track track-waveform" id="waveformTrack">
-        <canvas id="waveformCanvas"></canvas>
-      </div>
-      <div id="playheadLine"></div>
-    </div>
-    <div id="beatIndicator"></div>
-  </div>
 
   <script>
-    // Lines in both languages
-    const LINES_CZ = [
+    // Czech text only
+    const LINES_RAW = [
       "Strach, že si pro mě přijdou",
       "Strach, že zaspim",
       "Strach, že ani neusnu",
@@ -502,65 +76,28 @@
       "Strach ze smrti",
       "Strach, že budu žít až moc dlouho",
       "Strach ze smrti",
-      "Jo, to sem říkal"  // finale line - no anchor, centered
+      "Jo, to sem říkal"
     ];
 
-    const LINES_EN = [
-      "Fear of seeing a police car pull into the drive.",
-      "Fear of falling asleep at night.",
-      "Fear of not falling asleep.",
-      "Fear of the past rising up.",
-      "Fear of the present taking flight.",
-      "Fear of the telephone that rings in the dead of night.",
-      "Fear of electrical storms.",
-      "Fear of the cleaning woman who has a spot on her cheek!",
-      "Fear of dogs I've been told won't bite.",
-      "Fear of anxiety!",
-      "Fear of having to identify the body of a dead friend.",
-      "Fear of running out of money.",
-      "Fear of having too much, though people will not believe this.",
-      "Fear of psychological profiles.",
-      "Fear of being late and fear of arriving before anyone else.",
-      "Fear of my children's handwriting on envelopes.",
-      "Fear they'll die before I do, and I'll feel guilty.",
-      "Fear of having to live with my mother in her old age, and mine.",
-      "Fear of confusion.",
-      "Fear this day will end on an unhappy note.",
-      "Fear of waking up to find you gone.",
-      "Fear of not loving and fear of not loving enough.",
-      "Fear that what I love will prove lethal to those I love.",
-      "Fear of death.",
-      "Fear of living too long.",
-      "Fear of death.",
-      "I've said that."  // finale line - no anchor, centered
-    ];
+    const ANCHOR_TEXT = "Strach";
+    const ANCHOR_LEN = 6;
 
-    const LANG_CONFIG = {
-      cz: { lines: LINES_CZ, anchor: "Strach", anchorLen: 6 },
-      en: { lines: LINES_EN, anchor: "Fear", anchorLen: 4 }
-    };
-
-    let currentLang = 'cz';
     let LINES = [];
 
-    function parseLines(lang) {
-      const config = LANG_CONFIG[lang];
-      const raw = config.lines;
-      const anchorLen = config.anchorLen;
-      const finaleIdx = raw.length - 1;
-
-      return raw.map((line, i) => {
+    function parseLines() {
+      const finaleIdx = LINES_RAW.length - 1;
+      return LINES_RAW.map((line, i) => {
         if (i === finaleIdx) {
           const words = line.match(/[^\s]+/g) || [];
           return { full: line, rest: line, words, isFinale: true };
         }
-        const rest = line.substring(anchorLen);
+        const rest = line.substring(ANCHOR_LEN);
         const words = rest.match(/[^\s]+/g) || [];
         return { full: line, rest, words, isFinale: false };
       });
     }
 
-    LINES = parseLines(currentLang);
+    LINES = parseLines();
 
     // Build character pool - count max occurrences per char across lines (excluding "Strach")
     function buildPool() {
@@ -576,7 +113,6 @@
         }
       });
 
-      // Create pool array
       const pool = [];
       for (const [char, count] of Object.entries(maxCounts)) {
         for (let i = 0; i < count; i++) {
@@ -589,93 +125,49 @@
     // Langevin physics constants
     const TEMPERATURE = 0.15;
     const DAMPING = 0.3;
-    const ORBITAL_STRENGTH = 0.002;  // tangential force for orbiting
-    const MARGIN_RADIUS = 80;        // minimum distance from center
-    const MARGIN_FORCE = 0.3;        // push force when inside margin
-    const WELL_STRENGTH = 0.12;      // pull to target when locked
-    const CLOUD_RADIUS = 180;        // preferred orbital distance
-    const CLOUD_PULL = 0.01;         // gentle pull to cloud radius
-    const REPULSION_STRENGTH = 150;  // inter-letter repulsion
-    const REPULSION_RANGE = 50;      // distance below which repulsion kicks in
+    const ORBITAL_STRENGTH = 0.002;
+    const MARGIN_RADIUS = 80;
+    const MARGIN_FORCE = 0.3;
+    const WELL_STRENGTH = 0.12;
+    const CLOUD_RADIUS = 180;
+    const CLOUD_PULL = 0.01;
+    const REPULSION_STRENGTH = 150;
+    const REPULSION_RANGE = 50;
     const DT = 1.0;
 
-    // Vibration synced to BPM
-    let bpm = 153;
-    let bpmOffset = 0;          // seconds - where beat 1 starts
-    let beatMs = 60000 / bpm;   // ~392ms per beat
+    // Vibration (using performance.now instead of audio BPM)
+    const VIBRATION_BPM = 153;
+    const VIBRATION_BEAT_MS = 60000 / VIBRATION_BPM;
     const VIBRATION_AMPLITUDE = 1.2;
 
     // Glitch state
     let glitchActive = false;
     let glitchStartTime = 0;
-    let glitchDuration = 80;  // ms
-    let lastBeat = -1;
-    let beatOffset = 0;       // for syncing with enter key
-    let glitchLetters = [];  // which letters are affected
-    let glitchTearY = 0;     // y position of tear line
+    let glitchDuration = 80;
+    let glitchLetters = [];
+    let glitchTearY = 0;
 
-    // Glitch settings (controlled by sliders)
-    let glitchFreq = 1.0;       // probability per beat
+    // Glitch settings (fixed defaults, no sliders)
+    let glitchFreq = 1.0;
     let glitchPosStrength = 0.5;
     let glitchOpacityStrength = 0.64;
     let glitchTearStrength = 1.0;
-    let spacebarOverdrive = false;  // space bar held
-    let overdrive = false;          // computed: timeline region OR spacebar
-    let overdriveMultiplier = 4;    // 2x to 10x
+    let overdrive = false;
+    let overdriveMultiplier = 4;
 
     let letters = [];
     let anchorEl;
     let centerX, centerY;
     let anchorWidth, anchorY;
     let currentLine = 0;
-    let currentWord = 0;  // how many words locked in current line
+    let currentWord = 0;
+    let finaleMode = false;
 
-    // Audio/Timeline state
-    let audioContext = null;
-    let audioBuffer = null;
-    let audioSource = null;
-    let isPlaying = false;
-    let playStartTime = 0;      // audioContext.currentTime when playback started
-    let playOffset = 0;         // offset into audio when playback started
-    let audioDuration = 0;
-    let waveformData = null;    // Float32Array of waveform peaks
-
-    // Timeline events
-    let transitions = [];       // [{start, end, startBeat, endBeat, lineIndex, lockBeats, unlockBeats}, ...]
-    let overdrives = [];        // [{start: seconds, end: seconds}, ...]
-    let silences = [];          // [{start: seconds, end: seconds}, ...] - mutes glitch effect
-    let lastTriggeredLock = -1;        // tracks which lock phases have fired
-    let lastTriggeredUnlock = -1;      // tracks which unlock phases have fired
-
-    // Animation timeout tracking (for cleanup during scrub)
-    let animationTimeouts = [];
-
-    // Drag state
-    let dragging = null;        // {type: 'transition'|'od-start'|'od-end'|'od-move', index: n}
-    let dragStartX = 0;         // mousedown position for drag detection
-    let dragStartY = 0;
-    const DRAG_THRESHOLD = 5;   // pixels - must move this far to count as drag
-    let selectedMarker = null;  // {type: 'tr'|'od'|'seg', index: n} - enables resizing
-    const MIN_BEATS_BETWEEN = 2; // minimum beats between transitions
-
-    // Playback segment
-    let playbackSegment = {
-      start: 0,
-      end: 0,
-      startBeat: 0,
-      endBeat: 0
-    };
-
-    // Segment redistribution constants
-    let gapRatio = 0;            // 0-100, controls gap vs duration distribution
-    const GAP_MIN = 2;           // beats - minimum gap at ratio 0
-    const GAP_MAX = 20;          // beats - maximum gap at ratio 100
-    const GAP_FLOOR = 0;         // beats - absolute minimum gap
-    const DURATION_FLOOR = 2;    // beats - absolute minimum duration
-
-    function getGapTarget() {
-      return GAP_MIN + (gapRatio / 100) * (GAP_MAX - GAP_MIN);
-    }
+    // Scroll state
+    let scrollProgress = 0;       // 0..1
+    let lastScrollY = 0;
+    let scrollDelta = 0;          // pixels per frame, for glitch triggering
+    let lastScrollTime = 0;
 
     // Box-Muller gaussian
     function gaussianRandom() {
@@ -690,13 +182,11 @@
         this.char = char;
         this.index = index;
 
-        // Start in random orbit position
         const angle = Math.random() * Math.PI * 2;
         const radius = MARGIN_RADIUS + Math.random() * (CLOUD_RADIUS - MARGIN_RADIUS);
         this.x = centerX + Math.cos(angle) * radius;
         this.y = centerY + Math.sin(angle) * radius;
 
-        // Initial orbital velocity (tangent to radius)
         const speed = 0.5 + Math.random() * 0.5;
         this.vx = -Math.sin(angle) * speed;
         this.vy = Math.cos(angle) * speed;
@@ -704,16 +194,14 @@
         this.ax = 0;
         this.ay = 0;
 
-        // Target position (set when assigned to a word)
         this.targetX = null;
         this.targetY = null;
         this.isLocked = false;
-        this.assignment = null;  // { lineIndex, wordIndex, charIndex }
+        this.assignment = null;
 
         this.opacity = 0.15 + Math.random() * 0.15;
         this.baseOpacity = this.opacity;
 
-        // DOM
         this.el = document.createElement('span');
         this.el.className = 'letter';
         this.el.textContent = char;
@@ -728,35 +216,28 @@
         const dist = Math.sqrt(dx * dx + dy * dy);
 
         if (this.isLocked && this.targetX !== null) {
-          // Pull to target
           const tdx = this.targetX - this.x;
           const tdy = this.targetY - this.y;
           fx += tdx * WELL_STRENGTH;
           fy += tdy * WELL_STRENGTH;
         } else {
-          // Orbital dynamics
-
-          // 1. Margin repulsion - push away if too close to center
           if (dist < MARGIN_RADIUS && dist > 0) {
             const pushStrength = MARGIN_FORCE * (1 - dist / MARGIN_RADIUS);
             fx += (dx / dist) * pushStrength;
             fy += (dy / dist) * pushStrength;
           }
 
-          // 2. Cloud radius pull - gentle attraction to preferred orbit
           if (dist > 0) {
             const radiusDiff = CLOUD_RADIUS - dist;
             fx += (dx / dist) * radiusDiff * CLOUD_PULL;
             fy += (dy / dist) * radiusDiff * CLOUD_PULL;
 
-            // Slight outward pull in finale
             if (finaleMode) {
               fx += (dx / dist) * 0.003;
               fy += (dy / dist) * 0.003;
             }
           }
 
-          // 3. Orbital force - perpendicular to radius
           if (dist > MARGIN_RADIUS * 0.5) {
             const tangentX = -dy / dist;
             const tangentY = dx / dist;
@@ -765,10 +246,8 @@
           }
         }
 
-        // 4. Inter-letter repulsion (none between locked letters, but unlocked can push through)
         for (const other of allLetters) {
           if (other === this) continue;
-          // Skip if both are locked - no mutual repulsion within locked text
           if (this.isLocked && other.isLocked) continue;
 
           const ox = this.x - other.x;
@@ -782,11 +261,9 @@
           }
         }
 
-        // Damping
         fx -= DAMPING * this.vx;
         fy -= DAMPING * this.vy;
 
-        // Thermal noise (reduced when locked)
         const temp = this.isLocked ? TEMPERATURE * 0.08 : TEMPERATURE;
         const noiseStrength = Math.sqrt(2 * DAMPING * temp);
         fx += noiseStrength * gaussianRandom();
@@ -827,28 +304,25 @@
         let ry = this.y;
         let opacity = this.opacity;
 
-        // Add vibration for unlocked letters
+        // Vibration for unlocked letters (using performance.now)
         if (!this.isLocked) {
-          const phase = (time / beatMs) * Math.PI * 2 + this.index * 0.7;
+          const phase = (time / VIBRATION_BEAT_MS) * Math.PI * 2 + this.index * 0.7;
           rx += Math.sin(phase) * VIBRATION_AMPLITUDE;
           ry += Math.cos(phase * 1.3) * VIBRATION_AMPLITUDE * 0.7;
         }
 
-        // Apply glitch effects
+        // Glitch effects
         if (glitchActive && glitchLetters.includes(this.index)) {
           const glitchProgress = (time - glitchStartTime) / glitchDuration;
           if (glitchProgress < 1) {
-            const intensity = Math.sin(glitchProgress * Math.PI);  // peaks in middle
+            const intensity = Math.sin(glitchProgress * Math.PI);
             const mult = overdrive ? overdriveMultiplier : 1;
 
-            // Position jump
             rx += (Math.random() - 0.5) * 20 * glitchPosStrength * intensity * mult;
             ry += (Math.random() - 0.5) * 10 * glitchPosStrength * intensity * mult;
 
-            // Opacity flash
             opacity = Math.min(1, opacity + (Math.random() * 0.8) * glitchOpacityStrength * intensity * mult);
 
-            // Horizontal tear (shift letters near tear line)
             const distFromTear = Math.abs(this.y - glitchTearY);
             if (distFromTear < 30) {
               const tearIntensity = (1 - distFromTear / 30) * intensity;
@@ -870,7 +344,7 @@
       }
     }
 
-    const SPACE_EXPANSION = 1.5;  // multiplier for space width
+    const SPACE_EXPANSION = 1.5;
 
     function measureText(text) {
       const measurer = document.createElement('div');
@@ -883,7 +357,6 @@
       `;
       document.body.appendChild(measurer);
 
-      // Measure space width
       measurer.textContent = ' ';
       const spaceWidth = measurer.getBoundingClientRect().width;
       const extraSpace = spaceWidth * (SPACE_EXPANSION - 1);
@@ -904,33 +377,17 @@
       return { positions, totalWidth };
     }
 
-    function assignLettersToLine(lineIndex) {
-      // Release all letters
-      letters.forEach(l => {
-        l.isLocked = false;
-        l.targetX = null;
-        l.targetY = null;
-        l.assignment = null;
-      });
-
-      currentWord = 0;
-    }
-
     function lockWord(wordIndex) {
       const line = LINES[currentLine];
       if (wordIndex >= line.words.length) return;
 
-      // Build the text up to and including this word
       const wordsToShow = line.words.slice(0, wordIndex + 1);
       const textToShow = wordsToShow.join(' ');
 
-      // Measure positions relative to anchor
       const { positions, totalWidth } = measureText(textToShow);
 
-      // Start position: centered for finale (based on full line), after Strach otherwise
       let startX;
       if (line.isFinale) {
-        // Measure full line for proper centering
         const fullText = line.words.join(' ');
         const { totalWidth: fullWidth } = measureText(fullText);
         startX = centerX - fullWidth / 2;
@@ -939,7 +396,6 @@
       }
       const lineY = anchorY;
 
-      // Find letters for this word
       const word = line.words[wordIndex];
       const wordStartInText = wordIndex === 0 ? 0 :
         line.words.slice(0, wordIndex).join(' ').length + 1;
@@ -950,7 +406,6 @@
         const targetX = startX + positions[posIndex].x;
         const targetY = lineY;
 
-        // Find an available letter with this char
         const letter = letters.find(l =>
           l.char === char && !l.isLocked
         );
@@ -964,127 +419,25 @@
       }
     }
 
-    // Group words for beat-synced animation (short words 1-2 chars group with next)
-    function getWordGroups(words) {
-      const groups = [];
-      let i = 0;
-      while (i < words.length) {
-        const group = [i];
-        // If this word is short (1-2 chars) and there's a next word, group them
-        while (words[i] && words[i].length <= 2 && i + 1 < words.length) {
-          i++;
-          group.push(i);
-        }
-        groups.push(group);
-        i++;
-      }
-      return groups;
-    }
-
-    // Calculate transition duration in beats for a line
-    // Lock: 1 beat per word group (appearing)
-    // Unlock: 8 letters per beat (disappearing)
-    function getLineDuration(lineIndex) {
-      const line = LINES[lineIndex];
-      const groups = getWordGroups(line.words);
-      const lockBeats = groups.length;
-
-      // Count total letters (excluding spaces)
-      const totalLetters = line.words.join('').length;
-      const unlockBeats = Math.ceil(totalLetters / 8);
-
-      return {
-        lockBeats,
-        unlockBeats,
-        totalBeats: lockBeats + unlockBeats
-      };
-    }
-
-    function clearAnimationTimeouts() {
-      animationTimeouts.forEach(id => clearTimeout(id));
-      animationTimeouts = [];
-    }
-
-    function lockAllWords() {
+    function lockAllWordsInstant() {
       const line = LINES[currentLine];
-      const groups = getWordGroups(line.words);
-
-      // Schedule each group on a beat, starting from NEXT beat
-      const startTime = performance.now();
-      const currentBeat = getBeat(startTime);
-
-      groups.forEach((group, beatIndex) => {
-        const targetBeat = currentBeat + 1 + beatIndex;  // +1 to wait for next beat
-        const targetTime = beatOffset + (targetBeat * beatMs);
-        const delay = Math.max(0, targetTime - startTime);
-
-        const timeoutId = setTimeout(() => {
-          group.forEach(wordIndex => lockWord(wordIndex));
-        }, delay);
-        animationTimeouts.push(timeoutId);
-      });
-
+      for (let wordIndex = 0; wordIndex < line.words.length; wordIndex++) {
+        lockWord(wordIndex);
+      }
       currentWord = line.words.length;
     }
 
-    function unlockLetter(letter) {
-      letter.isLocked = false;
-      letter.targetX = null;
-      letter.targetY = null;
-      letter.assignment = null;
-    }
-
-    function unlockWordsOnBeat(lineIndex, callback) {
-      const line = LINES[lineIndex];
-      if (!line) return 0;
-
-      // Get all locked letters for this line, sorted back to front
-      const lockedLetters = letters
-        .filter(l => l.assignment && l.assignment.lineIndex === lineIndex)
-        .sort((a, b) => {
-          // Sort by word index (descending), then char index (descending)
-          if (b.assignment.wordIndex !== a.assignment.wordIndex) {
-            return b.assignment.wordIndex - a.assignment.wordIndex;
-          }
-          return b.assignment.charIndex - a.assignment.charIndex;
-        });
-
-      if (lockedLetters.length === 0) {
-        if (callback) callback();
-        return 0;
-      }
-
-      const startTime = performance.now();
-      // Wait for next beat
-      const currentBeat = getBeat(startTime);
-      const nextBeatTime = beatOffset + ((currentBeat + 1) * beatMs);
-      const timeToNextBeat = nextBeatTime - startTime;
-
-      // 8 letters per beat
-      const lettersPerBeat = 8;
-      const msPerLetter = beatMs / lettersPerBeat;
-
-      lockedLetters.forEach((letter, i) => {
-        const delay = timeToNextBeat + (i * msPerLetter);
-        const timeoutId = setTimeout(() => unlockLetter(letter), delay);
-        animationTimeouts.push(timeoutId);
+    function unlockAllLetters() {
+      letters.forEach(l => {
+        l.isLocked = false;
+        l.targetX = null;
+        l.targetY = null;
+        l.assignment = null;
       });
-
-      // Callback after all letters done
-      const totalTime = timeToNextBeat + (lockedLetters.length * msPerLetter);
-      // Round up to next beat for callback
-      const totalBeats = Math.ceil(lockedLetters.length / lettersPerBeat);
-      if (callback) {
-        const callbackTime = timeToNextBeat + (totalBeats * beatMs);
-        const timeoutId = setTimeout(callback, callbackTime);
-        animationTimeouts.push(timeoutId);
-      }
-
-      return totalBeats;
+      currentWord = 0;
     }
 
     function dissolveStrach() {
-      // Create letters for "Strach" and add to cloud
       const strachChars = 'Strach';
       for (const char of strachChars) {
         const letter = new Letter(char, letters.length);
@@ -1095,177 +448,154 @@
         letters.push(letter);
       }
 
-      // Fade out anchor
       document.getElementById('anchor').style.transition = 'opacity 0.3s';
       document.getElementById('anchor').style.opacity = '0';
       finaleMode = true;
     }
 
     function restoreStrach() {
-      // Fade anchor back in
       document.getElementById('anchor').style.transition = 'opacity 0.3s';
       document.getElementById('anchor').style.opacity = '1';
       finaleMode = false;
     }
 
-    function transitionToNextLine() {
-      const prevLineIndex = currentLine;
+    // ============ SCROLL-DRIVEN LINE PROGRESSION ============
 
-      currentLine++;
-      if (currentLine >= LINES.length) {
-        // Past the end, stay on last line
-        currentLine = LINES.length - 1;
-        return;
+    // Each line gets an equal fraction of the scroll range.
+    // Within each line's fraction:
+    //   0.0 - 0.3 : lock phase (letters animate to position)
+    //   0.3 - 0.7 : visible (letters locked in place)
+    //   0.7 - 1.0 : unlock phase (letters release back to cloud)
+
+    const LOCK_FRAC = 0.3;
+    const VISIBLE_FRAC = 0.4;
+    const UNLOCK_FRAC = 0.3;
+
+    let prevActiveLine = -1;
+    let prevPhase = 'none';
+
+    function updateScrollState() {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      scrollProgress = maxScroll > 0 ? window.scrollY / maxScroll : 0;
+      scrollProgress = Math.max(0, Math.min(1, scrollProgress));
+
+      // Scroll delta for glitch triggering
+      const now = performance.now();
+      const dt = now - lastScrollTime;
+      if (dt > 0) {
+        scrollDelta = Math.abs(window.scrollY - lastScrollY) / dt * 16; // normalize to ~per-frame
       }
-
-      // Beat-synced unlock back to front
-      const callback = LINES[currentLine].isFinale ? dissolveStrach : null;
-      unlockWordsOnBeat(prevLineIndex, callback);
-
-      currentWord = 0;
+      lastScrollY = window.scrollY;
+      lastScrollTime = now;
     }
 
-    let finaleMode = false;  // when true, unlocked letters drift outward
+    function getLineState(progress) {
+      const numLines = LINES.length;
+      const lineFloat = progress * numLines;
+      const lineIndex = Math.min(Math.floor(lineFloat), numLines - 1);
+      const lineLocalProgress = lineFloat - lineIndex;
 
-    function advance() {
-      const line = LINES[currentLine];
+      let phase, phaseProgress;
 
-      if (currentWord < line.words.length) {
-        // Lock all words with stagger
-        lockAllWords();
+      if (lineLocalProgress < LOCK_FRAC) {
+        phase = 'lock';
+        phaseProgress = lineLocalProgress / LOCK_FRAC;
+      } else if (lineLocalProgress < LOCK_FRAC + VISIBLE_FRAC) {
+        phase = 'visible';
+        phaseProgress = (lineLocalProgress - LOCK_FRAC) / VISIBLE_FRAC;
       } else {
-        // All words locked, go to next line
-        transitionToNextLine();
+        phase = 'unlock';
+        phaseProgress = (lineLocalProgress - LOCK_FRAC - VISIBLE_FRAC) / UNLOCK_FRAC;
       }
 
-      updateDebug();
-      updateLineNav();
+      return { lineIndex, phase, phaseProgress };
     }
 
-    function goBack() {
-      if (currentLine === 0 && currentWord === 0) return;
+    function applyScrollToAnimation() {
+      const { lineIndex, phase, phaseProgress } = getLineState(scrollProgress);
 
-      // If we have words locked on current line, just unlock them (beat-synced)
-      if (currentWord > 0) {
-        unlockWordsOnBeat(currentLine, null);
-        currentWord = 0;
-        updateDebug();
-        updateLineNav();
-        return;
+      // Detect line or phase change
+      const lineChanged = lineIndex !== prevActiveLine;
+      const phaseChanged = phase !== prevPhase;
+
+      if (lineChanged || phaseChanged) {
+        // Handle Strach visibility for finale
+        const wasFinale = prevActiveLine >= 0 && LINES[prevActiveLine] && LINES[prevActiveLine].isFinale;
+        const willBeFinale = LINES[lineIndex].isFinale;
+
+        if (!wasFinale && willBeFinale && phase === 'lock') {
+          dissolveStrach();
+        } else if (wasFinale && !willBeFinale) {
+          restoreStrach();
+        }
+
+        if (phase === 'lock') {
+          // Entering lock phase: release all, then lock words progressively
+          unlockAllLetters();
+          currentLine = lineIndex;
+
+          // Lock all words (they animate via physics to their targets)
+          lockAllWordsInstant();
+        } else if (phase === 'visible') {
+          // Should already be locked, but ensure
+          if (currentLine !== lineIndex || currentWord < LINES[lineIndex].words.length) {
+            unlockAllLetters();
+            currentLine = lineIndex;
+            lockAllWordsInstant();
+          }
+        } else if (phase === 'unlock') {
+          // Release letters back to cloud
+          if (currentWord > 0) {
+            unlockAllLetters();
+          }
+          currentLine = lineIndex;
+        }
+
+        prevActiveLine = lineIndex;
+        prevPhase = phase;
       }
-
-      // If on finale line, restore Strach
-      if (LINES[currentLine].isFinale) {
-        restoreStrach();
-      }
-
-      // Release current line letters immediately
-      letters.forEach(l => {
-        l.isLocked = false;
-        l.targetX = null;
-        l.targetY = null;
-        l.assignment = null;
-      });
-
-      currentLine--;
-      currentWord = 0;
-
-      updateDebug();
-      updateLineNav();
     }
 
-    function goToLine(targetLine) {
-      if (targetLine < 0 || targetLine >= LINES.length) return;
+    window.addEventListener('scroll', () => {
+      updateScrollState();
+      applyScrollToAnimation();
+    }, { passive: true });
 
-      // Handle Strach visibility
-      const wasFinale = LINES[currentLine].isFinale;
-      const willBeFinale = LINES[targetLine].isFinale;
-
-      if (!wasFinale && willBeFinale) {
-        dissolveStrach();
-      } else if (wasFinale && !willBeFinale) {
-        restoreStrach();
-      }
-
-      // Release all letters
-      letters.forEach(l => {
-        l.isLocked = false;
-        l.targetX = null;
-        l.targetY = null;
-        l.assignment = null;
-      });
-
-      currentLine = targetLine;
-      currentWord = 0;
-
-      updateDebug();
-      updateLineNav();
-    }
-
-    function updateLineNav() {
-      const items = document.querySelectorAll('.line-nav-item');
-      items.forEach((item, i) => {
-        item.classList.toggle('active', i === currentLine);
-      });
-    }
-
-    function buildLineNav() {
-      const nav = document.getElementById('lineNav');
-      // Clear existing items
-      nav.innerHTML = '';
-
-      LINES.forEach((line, i) => {
-        const item = document.createElement('div');
-        item.className = 'line-nav-item';
-        item.textContent = (i + 1).toString().padStart(2, '0');
-        item.addEventListener('click', () => goToLine(i));
-        nav.appendChild(item);
-      });
-      // Add finale
-      const finaleItem = document.createElement('div');
-      finaleItem.className = 'line-nav-item';
-      finaleItem.textContent = '••';
-      finaleItem.addEventListener('click', () => goToLine(LINES.length - 1));
-      nav.appendChild(finaleItem);
-    }
-
-    function updateDebug() {
-      const line = LINES[currentLine];
-      document.getElementById('debug').textContent =
-        `line: ${currentLine} | word: ${currentWord}/${line ? line.words.length : 0}`;
-    }
-
-    function getBeat(time) {
-      return Math.floor((time - beatOffset) / beatMs);
-    }
+    // ============ GLITCH (scroll-speed driven) ============
 
     function checkGlitch(time) {
-      const currentBeat = getBeat(time);
+      // Trigger glitch based on scroll speed
+      // scrollDelta is ~pixels per frame; higher = more likely
+      const scrollSpeed = Math.min(scrollDelta, 60); // cap
+      const probability = (scrollSpeed / 20) * glitchFreq; // fast scroll = high probability
 
-      // Check for new beat
-      if (currentBeat !== lastBeat) {
-        lastBeat = currentBeat;
+      // Also trigger on beat for ambient shimmer (low probability when idle)
+      const beatPhase = (time / VIBRATION_BEAT_MS) % 1;
+      const onBeat = beatPhase < 0.05;
 
-        // Random chance to trigger glitch on this beat (unless muted by silence region)
-        if (!activeSilence && Math.random() < glitchFreq) {
+      if (onBeat && !glitchActive) {
+        const trigger = Math.random() < Math.max(probability, 0.02);
+        if (trigger) {
           glitchActive = true;
           glitchStartTime = time;
 
-          // Select random subset of letters to affect
           glitchLetters = letters
             .filter(() => Math.random() < 0.4)
             .map(l => l.index);
 
-          // Random tear line position
           glitchTearY = centerY + (Math.random() - 0.5) * 200;
+
+          // Faster scroll = overdrive
+          overdrive = scrollSpeed > 30;
         }
       }
 
-      // End glitch after duration (or immediately if silence region active)
-      if (glitchActive && (activeSilence || time - glitchStartTime > glitchDuration)) {
+      if (glitchActive && time - glitchStartTime > glitchDuration) {
         glitchActive = false;
       }
     }
+
+    // ============ ANIMATION LOOP ============
 
     function animate(time) {
       checkGlitch(time);
@@ -1284,7 +614,6 @@
       centerX = window.innerWidth / 2;
       centerY = window.innerHeight / 2;
 
-      // Position anchor using transform (same as letters)
       anchorEl = document.getElementById('anchor');
       const anchorRect = anchorEl.getBoundingClientRect();
       anchorWidth = anchorRect.width;
@@ -1292,2277 +621,20 @@
       anchorY = centerY - anchorRect.height / 2;
       anchorEl.style.transform = `translate(${anchorX}px, ${anchorY}px)`;
 
-      // Create letter pool
       const pool = buildPool();
       pool.forEach((char, i) => {
         const letter = new Letter(char, i);
         letters.push(letter);
       });
 
-      buildLineNav();
-      updateLineNav();
-      updateDebug();
-      setupLangSwitch();
+      // Initialize scroll state
+      updateScrollState();
+      applyScrollToAnimation();
+
       requestAnimationFrame(animate);
     }
 
-    function switchLanguage(lang) {
-      if (lang === currentLang) return;
-
-      currentLang = lang;
-      LINES = parseLines(lang);
-
-      // Update anchor text
-      const config = LANG_CONFIG[lang];
-      anchorEl.textContent = config.anchor;
-
-      // Reposition anchor (width may change)
-      const anchorRect = anchorEl.getBoundingClientRect();
-      anchorWidth = anchorRect.width;
-      const anchorX = centerX - anchorWidth / 2;
-      anchorEl.style.transform = `translate(${anchorX}px, ${anchorY}px)`;
-
-      // Clear any pending animation timeouts
-      clearAnimationTimeouts();
-
-      // Clear existing letters
-      letters.forEach(l => l.el.remove());
-      letters = [];
-
-      // Rebuild letter pool
-      const pool = buildPool();
-      pool.forEach((char, i) => {
-        const letter = new Letter(char, i);
-        letters.push(letter);
-      });
-
-      // Reset animation state
-      currentLine = 0;
-      currentWord = 0;
-      lastTriggeredLock = -1;
-      lastTriggeredUnlock = -1;
-      if (finaleMode) restoreStrach();
-
-      // Rebuild line nav (clears and rebuilds)
-      buildLineNav();
-      updateLineNav();
-      updateDebug();
-
-      // Update button states
-      document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.lang === lang);
-      });
-
-      // Reinitialize transitions for new line count/durations
-      if (audioDuration > 0) {
-        initTimelineEvents();
-        redistributeMarkers();
-        drawTimeline();
-        saveState();
-      }
-    }
-
-    function setupLangSwitch() {
-      document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          switchLanguage(btn.dataset.lang);
-        });
-      });
-    }
-
-    // Input handlers
-    document.addEventListener('keydown', (e) => {
-      if (e.code === 'ArrowRight' || e.code === 'ArrowDown') {
-        e.preventDefault();
-        advance();
-      } else if (e.code === 'ArrowLeft' || e.code === 'ArrowUp') {
-        e.preventDefault();
-        goBack();
-      } else if (e.code === 'Space') {
-        e.preventDefault();
-        spacebarOverdrive = true;
-        overdrive = activeOverdrive || spacebarOverdrive;
-      } else if (e.code === 'Enter') {
-        e.preventDefault();
-        // Sync beat - reset beat counter to start of current time
-        beatOffset = performance.now();
-        lastBeat = -1;
-      }
-    });
-
-    document.addEventListener('keyup', (e) => {
-      if (e.code === 'Space') {
-        spacebarOverdrive = false;
-        overdrive = activeOverdrive || spacebarOverdrive;
-      }
-    });
-
-    // ============ AUDIO/TIMELINE ============
-
-    async function initAudio() {
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-      try {
-        const response = await fetch('alle-werden-alt.mp3');
-        const arrayBuffer = await response.arrayBuffer();
-        audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-        audioDuration = audioBuffer.duration;
-
-        // Extract waveform data for visualization
-        extractWaveform();
-
-        // Initialize timeline events
-        initTimelineEvents();
-
-        // Load saved state or redistribute fresh
-        const saved = loadState();
-        if (saved) {
-          applyLoadedState(saved);
-        } else {
-          redistributeMarkers();
-        }
-
-        drawTimeline();
-
-        console.log(`Audio loaded: ${audioDuration.toFixed(1)}s`);
-      } catch (err) {
-        console.error('Failed to load audio:', err);
-      }
-    }
-
-    function extractWaveform() {
-      const rawData = audioBuffer.getChannelData(0);
-      const samples = 1000;  // number of bars in waveform
-      const blockSize = Math.floor(rawData.length / samples);
-      waveformData = new Float32Array(samples);
-
-      for (let i = 0; i < samples; i++) {
-        let sum = 0;
-        for (let j = 0; j < blockSize; j++) {
-          sum += Math.abs(rawData[i * blockSize + j]);
-        }
-        waveformData[i] = sum / blockSize;
-      }
-
-      // Normalize
-      const max = Math.max(...waveformData);
-      for (let i = 0; i < waveformData.length; i++) {
-        waveformData[i] /= max;
-      }
-    }
-
-    // Beat helpers
-    function getBeatInterval() {
-      return 60 / bpm;
-    }
-
-    function snapToBeat(time) {
-      const beatInterval = getBeatInterval();
-      const beatsSinceOffset = Math.round((time - bpmOffset) / beatInterval);
-      return bpmOffset + beatsSinceOffset * beatInterval;
-    }
-
-    function timeToBeat(time) {
-      return Math.round((time - bpmOffset) / getBeatInterval());
-    }
-
-    function beatToTime(beat) {
-      return bpmOffset + beat * getBeatInterval();
-    }
-
-    // Recalculate all times from beat positions (after BPM/offset change)
-    function recalculateTimesFromBeats() {
-      // Segment
-      playbackSegment.start = beatToTime(playbackSegment.startBeat);
-      playbackSegment.end = beatToTime(playbackSegment.endBeat);
-
-      // Transitions
-      for (const tr of transitions) {
-        tr.start = beatToTime(tr.startBeat);
-        tr.end = beatToTime(tr.endBeat);
-      }
-
-      // Overdrives
-      for (const od of overdrives) {
-        od.start = beatToTime(od.startBeat);
-        od.end = beatToTime(od.endBeat);
-      }
-    }
-
-    // ============ PERSISTENCE ============
-    const STORAGE_KEY = 'strach-timeline-v1';
-
-    function saveState() {
-      const state = {
-        bpm,
-        bpmOffset,
-        gapRatio,
-        currentLang,
-        playbackSegment: {
-          startBeat: playbackSegment.startBeat,
-          endBeat: playbackSegment.endBeat
-        },
-        transitions: transitions.map(tr => ({
-          startBeat: tr.startBeat,
-          endBeat: tr.endBeat
-        })),
-        overdrives: overdrives.map(od => ({
-          startBeat: od.startBeat,
-          endBeat: od.endBeat
-        })),
-        silences: silences.map(sil => ({
-          startBeat: sil.startBeat,
-          endBeat: sil.endBeat
-        }))
-      };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }
-
-    function loadState() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return null;
-        return JSON.parse(raw);
-      } catch (e) {
-        console.warn('Failed to load saved state:', e);
-        return null;
-      }
-    }
-
-    function applyLoadedState(saved) {
-      // Apply BPM settings
-      bpm = saved.bpm || 153;
-      bpmOffset = saved.bpmOffset || 0;
-      gapRatio = saved.gapRatio || 0;
-      beatMs = 60000 / bpm;
-
-      // Update UI
-      document.getElementById('bpmInput').value = bpm;
-      document.getElementById('offsetInput').value = bpmOffset.toFixed(2);
-      document.getElementById('gapSlider').value = gapRatio;
-
-      // Apply language if different
-      if (saved.currentLang && saved.currentLang !== currentLang) {
-        switchLanguage(saved.currentLang);
-      }
-
-      // Apply playback segment
-      if (saved.playbackSegment) {
-        playbackSegment.startBeat = saved.playbackSegment.startBeat;
-        playbackSegment.endBeat = saved.playbackSegment.endBeat;
-        playbackSegment.start = beatToTime(playbackSegment.startBeat);
-        playbackSegment.end = beatToTime(playbackSegment.endBeat);
-      }
-
-      // Apply transitions (match by index, preserve lockBeats/unlockBeats)
-      if (saved.transitions && saved.transitions.length === transitions.length) {
-        for (let i = 0; i < transitions.length; i++) {
-          transitions[i].startBeat = saved.transitions[i].startBeat;
-          transitions[i].endBeat = saved.transitions[i].endBeat;
-          transitions[i].start = beatToTime(transitions[i].startBeat);
-          transitions[i].end = beatToTime(transitions[i].endBeat);
-        }
-      }
-
-      // Apply overdrives
-      if (saved.overdrives) {
-        overdrives = saved.overdrives.map(od => ({
-          start: beatToTime(od.startBeat),
-          end: beatToTime(od.endBeat),
-          startBeat: od.startBeat,
-          endBeat: od.endBeat
-        }));
-      }
-
-      // Apply silences
-      if (saved.silences) {
-        silences = saved.silences.map(sil => ({
-          start: beatToTime(sil.startBeat),
-          end: beatToTime(sil.endBeat),
-          startBeat: sil.startBeat,
-          endBeat: sil.endBeat
-        }));
-      }
-    }
-
-    // Calculate minimum segment size in beats (all transitions at floor duration, no gaps)
-    function calculateMinSegmentBeats() {
-      const n = transitions.length;
-      if (n === 0) return DURATION_FLOOR;
-      return n * DURATION_FLOOR;
-    }
-
-    // Push transitions in a direction with compression at boundary
-    // clickBeat: the push origin point (used for filtering if startIndex not provided)
-    // delta: how much to push (positive = right, negative = left)
-    // startIndex: optional index to start pushing from (for marker drag)
-    function pushTransitionsWithCompression(clickBeat, delta, startIndex = null) {
-      if (delta === 0) return;
-
-      const MARGIN = 6;
-      const boundaryStart = playbackSegment.startBeat + MARGIN;
-      const boundaryEnd = playbackSegment.endBeat - MARGIN;
-
-      if (delta > 0) {
-        // Pushing right: affect markers from startIndex or where startBeat >= clickBeat
-        const affected = [];
-        for (let i = 0; i < transitions.length; i++) {
-          if (startIndex !== null ? i >= startIndex : transitions[i].startBeat >= clickBeat) {
-            affected.push(i);
-          }
-        }
-        if (affected.length === 0) return;
-
-        // Sort by position (rightmost first)
-        affected.sort((a, b) => transitions[b].startBeat - transitions[a].startBeat);
-
-        // Start from rightmost, calculate compression needed
-        let overflow = 0;
-        for (const idx of affected) {
-          const tr = transitions[idx];
-          const newEnd = tr.endBeat + delta;
-          if (newEnd > boundaryEnd) {
-            overflow = Math.max(overflow, newEnd - boundaryEnd);
-          }
-        }
-
-        // If overflow, we need to compress
-        if (overflow > 0) {
-          // Calculate total compressible space in affected markers
-          // Priority: gaps first, then durations
-          let totalGapSpace = 0;
-          let totalDurationSpace = 0;
-
-          // Gaps between affected markers
-          const sortedByPos = [...affected].sort((a, b) => transitions[a].startBeat - transitions[b].startBeat);
-          for (let i = 1; i < sortedByPos.length; i++) {
-            const gap = transitions[sortedByPos[i]].startBeat - transitions[sortedByPos[i-1]].endBeat;
-            totalGapSpace += Math.max(0, gap - GAP_MIN);
-          }
-
-          // Duration compression (down to floor)
-          for (const idx of affected) {
-            const tr = transitions[idx];
-            const currentDur = tr.endBeat - tr.startBeat;
-            const minDur = Math.max(DURATION_FLOOR, tr.lockBeats + tr.unlockBeats);
-            totalDurationSpace += currentDur - minDur;
-          }
-
-          // Apply compression
-          let remainingOverflow = overflow;
-
-          // First: compress gaps
-          if (remainingOverflow > 0 && totalGapSpace > 0) {
-            const gapCompression = Math.min(remainingOverflow, totalGapSpace);
-            remainingOverflow -= gapCompression;
-          }
-
-          // Apply the push with compression
-          // Work from leftmost to rightmost
-          let pos = Math.max(boundaryStart, transitions[sortedByPos[0]].startBeat + delta - overflow + Math.min(overflow, totalGapSpace));
-
-          for (const idx of sortedByPos) {
-            const tr = transitions[idx];
-            const baseDur = tr.endBeat - tr.startBeat;
-            const minDur = Math.max(DURATION_FLOOR, tr.lockBeats + tr.unlockBeats);
-
-            // Calculate duration (compress if needed)
-            let dur = baseDur;
-            if (remainingOverflow > 0 && totalDurationSpace > 0) {
-              const myCompressible = baseDur - minDur;
-              const myShare = totalDurationSpace > 0 ? (myCompressible / totalDurationSpace) * remainingOverflow : 0;
-              dur = Math.max(minDur, baseDur - myShare);
-            }
-
-            tr.startBeat = Math.round(pos);
-            tr.endBeat = tr.startBeat + Math.round(dur);
-            tr.start = beatToTime(tr.startBeat);
-            tr.end = beatToTime(tr.endBeat);
-
-            pos = tr.endBeat + GAP_MIN;
-          }
-        } else {
-          // No overflow, just push
-          for (const idx of affected) {
-            transitions[idx].startBeat += delta;
-            transitions[idx].endBeat += delta;
-            transitions[idx].start = beatToTime(transitions[idx].startBeat);
-            transitions[idx].end = beatToTime(transitions[idx].endBeat);
-          }
-        }
-      } else {
-        // Pushing left: affect markers up to startIndex or where endBeat <= clickBeat
-        const affected = [];
-        for (let i = 0; i < transitions.length; i++) {
-          if (startIndex !== null ? i <= startIndex : transitions[i].endBeat <= clickBeat) {
-            affected.push(i);
-          }
-        }
-        if (affected.length === 0) return;
-
-        // Sort by position (leftmost first for compression)
-        affected.sort((a, b) => transitions[a].startBeat - transitions[b].startBeat);
-
-        // Check for underflow (going past start boundary)
-        let underflow = 0;
-        for (const idx of affected) {
-          const tr = transitions[idx];
-          const newStart = tr.startBeat + delta;
-          if (newStart < boundaryStart) {
-            underflow = Math.max(underflow, boundaryStart - newStart);
-          }
-        }
-
-        if (underflow > 0) {
-          // Calculate compressible space
-          let totalGapSpace = 0;
-          let totalDurationSpace = 0;
-
-          for (let i = 1; i < affected.length; i++) {
-            const gap = transitions[affected[i]].startBeat - transitions[affected[i-1]].endBeat;
-            totalGapSpace += Math.max(0, gap - GAP_MIN);
-          }
-
-          for (const idx of affected) {
-            const tr = transitions[idx];
-            const currentDur = tr.endBeat - tr.startBeat;
-            const minDur = Math.max(DURATION_FLOOR, tr.lockBeats + tr.unlockBeats);
-            totalDurationSpace += currentDur - minDur;
-          }
-
-          // Apply compression from left
-          let pos = boundaryStart;
-
-          for (const idx of affected) {
-            const tr = transitions[idx];
-            const baseDur = tr.endBeat - tr.startBeat;
-            const minDur = Math.max(DURATION_FLOOR, tr.lockBeats + tr.unlockBeats);
-
-            let dur = baseDur;
-            if (underflow > 0 && totalDurationSpace > 0) {
-              const myCompressible = baseDur - minDur;
-              const myShare = totalDurationSpace > 0 ? (myCompressible / totalDurationSpace) * underflow : 0;
-              dur = Math.max(minDur, baseDur - myShare);
-            }
-
-            tr.startBeat = Math.round(pos);
-            tr.endBeat = tr.startBeat + Math.round(dur);
-            tr.start = beatToTime(tr.startBeat);
-            tr.end = beatToTime(tr.endBeat);
-
-            pos = tr.endBeat + GAP_MIN;
-          }
-        } else {
-          // No underflow, just push
-          for (const idx of affected) {
-            transitions[idx].startBeat += delta;
-            transitions[idx].endBeat += delta;
-            transitions[idx].start = beatToTime(transitions[idx].startBeat);
-            transitions[idx].end = beatToTime(transitions[idx].endBeat);
-          }
-        }
-      }
-    }
-
-    // Redistribute markers to fill segment with 6-beat margins
-    // Visible time proportional to transition length, gaps controlled by slider
-    // Compression priority: gaps → visible time → gaps to 0 → durations to floor
-    function redistributeMarkers() {
-      const n = transitions.length;
-      if (n === 0) return;
-
-      const MARGIN = 6;  // beats margin at start and end
-      const totalBeats = playbackSegment.endBeat - playbackSegment.startBeat;
-      const availableBeats = totalBeats - (2 * MARGIN);
-
-      if (availableBeats <= 0) return;
-
-      // Calculate base durations (lock + unlock, no visible)
-      const baseDurations = transitions.map(tr => tr.lockBeats + tr.unlockBeats);
-      const floorDurations = baseDurations.map(d => Math.max(DURATION_FLOOR, d));
-      const sumBase = baseDurations.reduce((a, b) => a + b, 0);
-      const sumFloor = floorDurations.reduce((a, b) => a + b, 0);
-
-      const gapsCount = n - 1;
-      const gapTarget = getGapTarget();
-
-      // Calculate how much space we need for gaps at current slider value
-      const gapSpace = gapsCount * gapTarget;
-
-      // Remaining space after base durations and gaps = visible time pool
-      let visiblePool = availableBeats - sumBase - gapSpace;
-      let gap = gapTarget;
-      let durations;
-
-      if (visiblePool >= 0) {
-        // Enough space: distribute visible time proportionally to base duration
-        durations = baseDurations.map(base => {
-          const visibleShare = sumBase > 0 ? (base / sumBase) * visiblePool : 0;
-          return base + visibleShare;
-        });
-      } else {
-        // Not enough space - need to compress
-        // Priority 1: Reduce gaps to GAP_MIN (2 beats)
-        const minGapSpace = gapsCount * GAP_MIN;
-        visiblePool = availableBeats - sumBase - minGapSpace;
-
-        if (visiblePool >= 0) {
-          // Can fit with minimal gaps, no visible time
-          durations = [...baseDurations];
-          gap = gapsCount > 0 ? GAP_MIN + visiblePool / gapsCount : 0;
-          visiblePool = 0;
-        } else {
-          // Priority 2: Remove gaps entirely
-          visiblePool = availableBeats - sumBase;
-          gap = 0;
-
-          if (visiblePool >= 0) {
-            // Fits with no gaps
-            durations = [...baseDurations];
-          } else {
-            // Priority 3: Compress durations toward floor
-            if (availableBeats >= sumFloor) {
-              const range = sumBase - sumFloor;
-              const excess = availableBeats - sumFloor;
-              const t = range > 0 ? excess / range : 0;
-              durations = floorDurations.map((floor, i) => {
-                return floor + t * (baseDurations[i] - floor);
-              });
-            } else {
-              // Can't fit - use floor durations
-              durations = [...floorDurations];
-            }
-          }
-        }
-      }
-
-      // Position transitions with margins
-      let pos = playbackSegment.startBeat + MARGIN;
-      for (let i = 0; i < n; i++) {
-        const duration = Math.round(durations[i]);
-        transitions[i].startBeat = Math.round(pos);
-        transitions[i].endBeat = transitions[i].startBeat + duration;
-        transitions[i].start = beatToTime(transitions[i].startBeat);
-        transitions[i].end = beatToTime(transitions[i].endBeat);
-
-        pos = transitions[i].endBeat + (i < n - 1 ? Math.round(gap) : 0);
-      }
-    }
-
-    function initTimelineEvents() {
-      const numLines = LINES.length;
-      const totalBeats = timeToBeat(audioDuration);
-
-      // Initialize playback segment to cover entire track
-      playbackSegment = {
-        start: 0,
-        end: audioDuration,
-        startBeat: 0,
-        endBeat: totalBeats
-      };
-
-      // Create transitions with just their base properties
-      transitions = [];
-      for (let i = 0; i < numLines; i++) {
-        const duration = getLineDuration(i);
-        transitions.push({
-          start: 0,
-          end: 0,
-          startBeat: 0,
-          endBeat: 0,
-          lineIndex: i,
-          lockBeats: duration.lockBeats,
-          unlockBeats: duration.unlockBeats
-        });
-      }
-
-      // One test overdrive region
-      const odStartBeat = 6 + Math.floor(Math.random() * (totalBeats / 4));
-      const odEndBeat = odStartBeat + 4 + Math.floor(Math.random() * 8);
-      overdrives = [{
-        start: beatToTime(odStartBeat),
-        end: beatToTime(Math.min(odEndBeat, totalBeats - 6)),
-        startBeat: odStartBeat,
-        endBeat: Math.min(odEndBeat, totalBeats - 6)
-      }];
-    }
-
-    // Track which events have been triggered (for animation)
-    let lastPlayheadTime = 0;
-    let activeOverdrive = false;
-    let activeSilence = false;
-
-    function drawWaveform() {
-      const canvas = document.getElementById('waveformCanvas');
-      const container = document.getElementById('waveformTrack');
-      const rect = container.getBoundingClientRect();
-
-      canvas.width = rect.width * window.devicePixelRatio;
-      canvas.height = rect.height * window.devicePixelRatio;
-      canvas.style.width = rect.width + 'px';
-      canvas.style.height = rect.height + 'px';
-
-      const ctx = canvas.getContext('2d');
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-
-      const width = rect.width;
-      const height = rect.height;
-      const centerY = height / 2;
-
-      // Clear
-      ctx.fillStyle = '#0d0d0d';
-      ctx.fillRect(0, 0, width, height);
-
-      if (!waveformData) return;
-
-      // Draw waveform
-      ctx.fillStyle = '#333';
-      const barWidth = width / waveformData.length;
-
-      for (let i = 0; i < waveformData.length; i++) {
-        const barHeight = waveformData[i] * (height * 0.9);
-        const x = i * barWidth;
-        ctx.fillRect(x, centerY - barHeight / 2, Math.max(1, barWidth - 1), barHeight);
-      }
-
-      // Draw beat grid (subtle)
-      if (audioDuration > 0) {
-        const beatInterval = getBeatInterval();
-        ctx.strokeStyle = '#222';
-        ctx.lineWidth = 1;
-        for (let t = bpmOffset; t < audioDuration; t += beatInterval) {
-          const x = (t / audioDuration) * width;
-          ctx.beginPath();
-          ctx.moveTo(x, 0);
-          ctx.lineTo(x, height);
-          ctx.stroke();
-        }
-
-        // Dim areas outside playback segment
-        const timeToX = (t) => (t / audioDuration) * width;
-        const segStartX = timeToX(playbackSegment.start);
-        const segEndX = timeToX(playbackSegment.end);
-
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-        if (segStartX > 0) {
-          ctx.fillRect(0, 0, segStartX, height);
-        }
-        if (segEndX < width) {
-          ctx.fillRect(segEndX, 0, width - segEndX, height);
-        }
-      }
-    }
-
-    function drawTransitions() {
-      const canvas = document.getElementById('transitionsCanvas');
-      const container = document.getElementById('transitionsTrack');
-      const rect = container.getBoundingClientRect();
-
-      canvas.width = rect.width * window.devicePixelRatio;
-      canvas.height = rect.height * window.devicePixelRatio;
-      canvas.style.width = rect.width + 'px';
-      canvas.style.height = rect.height + 'px';
-
-      const ctx = canvas.getContext('2d');
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-
-      const width = rect.width;
-      const height = rect.height;
-
-      // Clear
-      ctx.fillStyle = '#0c0c0c';
-      ctx.fillRect(0, 0, width, height);
-
-      if (!audioDuration) return;
-
-      const timeToX = (t) => (t / audioDuration) * width;
-      const currentTime = getCurrentTime();
-
-      // Draw transition regions (like overdrive but with 3 phases)
-      // Colors: cyan for lock (appearing), white for visible, orange for unlock (dropping)
-      const lockColor = { r: 80, g: 180, b: 220 };    // cyan
-      const visibleColor = { r: 200, g: 200, b: 200 }; // light gray
-      const unlockColor = { r: 220, g: 140, b: 60 };  // orange
-
-      for (let i = 0; i < transitions.length; i++) {
-        const tr = transitions[i];
-        if (!audioDuration) continue;
-
-        const isSelected = selectedMarker && selectedMarker.type === 'tr' && selectedMarker.index === i;
-        const beatInterval = getBeatInterval();
-
-        // Calculate region bounds
-        const startX = timeToX(tr.start);
-        const endX = timeToX(tr.end);
-        const regionWidth = endX - startX;
-
-        // Calculate phase boundaries (in time)
-        const lockEndTime = tr.start + tr.lockBeats * beatInterval;
-        const unlockStartTime = tr.end - tr.unlockBeats * beatInterval;
-
-        // Convert to X positions
-        const lockEndX = timeToX(lockEndTime);
-        const unlockStartX = timeToX(unlockStartTime);
-
-        const lockWidth = lockEndX - startX;
-        const visibleWidth = Math.max(0, unlockStartX - lockEndX);
-        const unlockWidth = endX - unlockStartX;
-
-        // Determine current phase
-        let phase = 'before';
-        let phaseProgress = 0;
-
-        if (currentTime >= tr.end) {
-          phase = 'after';
-        } else if (currentTime >= unlockStartTime) {
-          phase = 'unlock';
-          phaseProgress = (currentTime - unlockStartTime) / (tr.end - unlockStartTime);
-        } else if (currentTime >= lockEndTime) {
-          phase = 'visible';
-          phaseProgress = (currentTime - lockEndTime) / (unlockStartTime - lockEndTime);
-        } else if (currentTime >= tr.start) {
-          phase = 'lock';
-          phaseProgress = (currentTime - tr.start) / (lockEndTime - tr.start);
-        }
-
-        // Draw base region (dimmed)
-        // Lock section
-        ctx.fillStyle = `rgba(${lockColor.r}, ${lockColor.g}, ${lockColor.b}, 0.12)`;
-        ctx.fillRect(startX, 2, lockWidth, height - 4);
-
-        // Visible section
-        if (visibleWidth > 0) {
-          ctx.fillStyle = `rgba(${visibleColor.r}, ${visibleColor.g}, ${visibleColor.b}, 0.08)`;
-          ctx.fillRect(lockEndX, 2, visibleWidth, height - 4);
-        }
-
-        // Unlock section
-        ctx.fillStyle = `rgba(${unlockColor.r}, ${unlockColor.g}, ${unlockColor.b}, 0.12)`;
-        ctx.fillRect(unlockStartX, 2, unlockWidth, height - 4);
-
-        // Draw progress highlight
-        if (phase === 'lock') {
-          const litWidth = lockWidth * phaseProgress;
-          ctx.fillStyle = `rgba(${lockColor.r}, ${lockColor.g}, ${lockColor.b}, 0.5)`;
-          ctx.fillRect(startX, 2, litWidth, height - 4);
-        } else if (phase === 'visible') {
-          // Lock complete
-          ctx.fillStyle = `rgba(${lockColor.r}, ${lockColor.g}, ${lockColor.b}, 0.35)`;
-          ctx.fillRect(startX, 2, lockWidth, height - 4);
-          // Visible progress
-          if (visibleWidth > 0) {
-            const litWidth = visibleWidth * phaseProgress;
-            ctx.fillStyle = `rgba(${visibleColor.r}, ${visibleColor.g}, ${visibleColor.b}, 0.25)`;
-            ctx.fillRect(lockEndX, 2, litWidth, height - 4);
-          }
-        } else if (phase === 'unlock') {
-          // Lock complete
-          ctx.fillStyle = `rgba(${lockColor.r}, ${lockColor.g}, ${lockColor.b}, 0.35)`;
-          ctx.fillRect(startX, 2, lockWidth, height - 4);
-          // Visible complete
-          if (visibleWidth > 0) {
-            ctx.fillStyle = `rgba(${visibleColor.r}, ${visibleColor.g}, ${visibleColor.b}, 0.2)`;
-            ctx.fillRect(lockEndX, 2, visibleWidth, height - 4);
-          }
-          // Unlock progress
-          const litWidth = unlockWidth * phaseProgress;
-          ctx.fillStyle = `rgba(${unlockColor.r}, ${unlockColor.g}, ${unlockColor.b}, 0.5)`;
-          ctx.fillRect(unlockStartX, 2, litWidth, height - 4);
-        } else if (phase === 'after') {
-          // All complete - subtle glow
-          ctx.fillStyle = `rgba(${lockColor.r}, ${lockColor.g}, ${lockColor.b}, 0.25)`;
-          ctx.fillRect(startX, 2, lockWidth, height - 4);
-          if (visibleWidth > 0) {
-            ctx.fillStyle = `rgba(${visibleColor.r}, ${visibleColor.g}, ${visibleColor.b}, 0.15)`;
-            ctx.fillRect(lockEndX, 2, visibleWidth, height - 4);
-          }
-          ctx.fillStyle = `rgba(${unlockColor.r}, ${unlockColor.g}, ${unlockColor.b}, 0.25)`;
-          ctx.fillRect(unlockStartX, 2, unlockWidth, height - 4);
-        }
-
-        // Draw region border
-        ctx.strokeStyle = isSelected ? '#fff' : (phase === 'before' ? '#444' : '#666');
-        ctx.lineWidth = isSelected ? 2 : 1;
-        ctx.strokeRect(startX + 0.5, 2.5, regionWidth - 1, height - 5);
-
-        // Draw edge handles (only when selected for resize)
-        if (isSelected) {
-          const handleY = height / 2;
-          const handleR = 5;
-
-          // Start handle (cyan)
-          ctx.fillStyle = `rgb(${lockColor.r}, ${lockColor.g}, ${lockColor.b})`;
-          ctx.beginPath();
-          ctx.arc(startX, handleY, handleR, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.strokeStyle = '#fff';
-          ctx.lineWidth = 1;
-          ctx.stroke();
-
-          // End handle (orange)
-          ctx.fillStyle = `rgb(${unlockColor.r}, ${unlockColor.g}, ${unlockColor.b})`;
-          ctx.beginPath();
-          ctx.arc(endX, handleY, handleR, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.strokeStyle = '#fff';
-          ctx.lineWidth = 1;
-          ctx.stroke();
-        }
-
-        // Duration label (line number)
-        ctx.font = '9px monospace';
-        ctx.fillStyle = '#888';
-        ctx.fillText(`${tr.lineIndex + 1}`, startX + 3, 10);
-      }
-    }
-
-    function drawOverdrives() {
-      const canvas = document.getElementById('overdrivesCanvas');
-      const container = document.getElementById('overdrivesTrack');
-      const rect = container.getBoundingClientRect();
-
-      canvas.width = rect.width * window.devicePixelRatio;
-      canvas.height = rect.height * window.devicePixelRatio;
-      canvas.style.width = rect.width + 'px';
-      canvas.style.height = rect.height + 'px';
-
-      const ctx = canvas.getContext('2d');
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-
-      const width = rect.width;
-      const height = rect.height;
-
-      // Clear
-      ctx.fillStyle = '#0c0c0c';
-      ctx.fillRect(0, 0, width, height);
-
-      if (!audioDuration) return;
-
-      const timeToX = (t) => (t / audioDuration) * width;
-      const currentTime = getCurrentTime();
-
-      // Draw overdrive regions
-      for (let i = 0; i < overdrives.length; i++) {
-        const od = overdrives[i];
-        const x1 = timeToX(od.start);
-        const x2 = timeToX(od.end);
-        const isActive = currentTime >= od.start && currentTime <= od.end;
-        const isSelected = selectedMarker && selectedMarker.type === 'od' && selectedMarker.index === i;
-
-        // Pulsing effect when active
-        let alpha = 0.4;
-        if (isActive) {
-          const pulse = 0.5 + 0.5 * Math.sin(performance.now() / 100);
-          alpha = 0.5 + pulse * 0.3;
-        }
-
-        ctx.fillStyle = `rgba(255, 80, 80, ${alpha})`;
-        ctx.fillRect(x1, 2, x2 - x1, height - 4);
-
-        // Border
-        ctx.strokeStyle = isSelected ? '#fff' : (isActive ? '#ff6666' : '#663333');
-        ctx.lineWidth = isSelected ? 2 : 1;
-        ctx.strokeRect(x1, 2, x2 - x1, height - 4);
-
-        // Resize handles at edges (only when selected)
-        if (isSelected) {
-          ctx.fillStyle = '#ff8888';
-          ctx.fillRect(x1 - 3, 0, 6, height);
-          ctx.fillRect(x2 - 3, 0, 6, height);
-          ctx.strokeStyle = '#fff';
-          ctx.lineWidth = 1;
-          ctx.strokeRect(x1 - 3, 0, 6, height);
-          ctx.strokeRect(x2 - 3, 0, 6, height);
-        }
-      }
-    }
-
-    function drawSilences() {
-      const canvas = document.getElementById('silencesCanvas');
-      const container = document.getElementById('silencesTrack');
-      const rect = container.getBoundingClientRect();
-
-      canvas.width = rect.width * window.devicePixelRatio;
-      canvas.height = rect.height * window.devicePixelRatio;
-      canvas.style.width = rect.width + 'px';
-      canvas.style.height = rect.height + 'px';
-
-      const ctx = canvas.getContext('2d');
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-
-      const width = rect.width;
-      const height = rect.height;
-
-      // Clear
-      ctx.fillStyle = '#0c0c0c';
-      ctx.fillRect(0, 0, width, height);
-
-      if (!audioDuration) return;
-
-      const timeToX = (t) => (t / audioDuration) * width;
-      const currentTime = getCurrentTime();
-
-      // Draw silence regions (blue/purple - opposite of red overdrive)
-      for (let i = 0; i < silences.length; i++) {
-        const sil = silences[i];
-        const x1 = timeToX(sil.start);
-        const x2 = timeToX(sil.end);
-        const isActive = currentTime >= sil.start && currentTime <= sil.end;
-        const isSelected = selectedMarker && selectedMarker.type === 'sil' && selectedMarker.index === i;
-
-        let alpha = 0.4;
-        if (isActive) {
-          alpha = 0.6;
-        }
-
-        ctx.fillStyle = `rgba(80, 120, 200, ${alpha})`;
-        ctx.fillRect(x1, 2, x2 - x1, height - 4);
-
-        // Border
-        ctx.strokeStyle = isSelected ? '#fff' : (isActive ? '#6688cc' : '#334466');
-        ctx.lineWidth = isSelected ? 2 : 1;
-        ctx.strokeRect(x1, 2, x2 - x1, height - 4);
-
-        // Resize handles at edges (only when selected)
-        if (isSelected) {
-          ctx.fillStyle = '#8899cc';
-          ctx.fillRect(x1 - 3, 0, 6, height);
-          ctx.fillRect(x2 - 3, 0, 6, height);
-          ctx.strokeStyle = '#fff';
-          ctx.lineWidth = 1;
-          ctx.strokeRect(x1 - 3, 0, 6, height);
-          ctx.strokeRect(x2 - 3, 0, 6, height);
-        }
-      }
-    }
-
-    function drawSegment() {
-      const canvas = document.getElementById('segmentCanvas');
-      const container = document.getElementById('segmentTrack');
-      const rect = container.getBoundingClientRect();
-
-      canvas.width = rect.width * window.devicePixelRatio;
-      canvas.height = rect.height * window.devicePixelRatio;
-      canvas.style.width = rect.width + 'px';
-      canvas.style.height = rect.height + 'px';
-
-      const ctx = canvas.getContext('2d');
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-
-      const width = rect.width;
-      const height = rect.height;
-
-      // Clear
-      ctx.fillStyle = '#0a0a0a';
-      ctx.fillRect(0, 0, width, height);
-
-      if (!audioDuration) return;
-
-      const timeToX = (t) => (t / audioDuration) * width;
-
-      // Draw dimmed regions outside segment
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-      const startX = timeToX(playbackSegment.start);
-      const endX = timeToX(playbackSegment.end);
-
-      // Left dimmed region
-      if (startX > 0) {
-        ctx.fillRect(0, 0, startX, height);
-      }
-      // Right dimmed region
-      if (endX < width) {
-        ctx.fillRect(endX, 0, width - endX, height);
-      }
-
-      // Draw segment region
-      const isSelected = selectedMarker && selectedMarker.type === 'seg';
-      const segWidth = endX - startX;
-      ctx.fillStyle = 'rgba(100, 180, 100, 0.3)';
-      ctx.fillRect(startX, 2, segWidth, height - 4);
-
-      // Border
-      ctx.strokeStyle = isSelected ? '#fff' : '#4a8a4a';
-      ctx.lineWidth = isSelected ? 2 : 1;
-      ctx.strokeRect(startX, 2, segWidth, height - 4);
-
-      // Resize handles at edges (only when selected)
-      if (isSelected) {
-        ctx.fillStyle = '#6aaa6a';
-        ctx.fillRect(startX - 3, 0, 6, height);
-        ctx.fillRect(endX - 3, 0, 6, height);
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(startX - 3, 0, 6, height);
-        ctx.strokeRect(endX - 3, 0, 6, height);
-      }
-    }
-
-    function updatePlayhead() {
-      if (!audioDuration) return;
-
-      const tracks = document.getElementById('timelineTracks');
-      const waveformTrack = document.getElementById('waveformTrack');
-      const playhead = document.getElementById('playheadLine');
-      const tracksRect = tracks.getBoundingClientRect();
-      const trackRect = waveformTrack.getBoundingClientRect();
-      const currentTime = getCurrentTime();
-
-      // Position relative to track content (accounting for padding)
-      const trackLeft = trackRect.left - tracksRect.left;
-      const x = trackLeft + (currentTime / audioDuration) * trackRect.width;
-
-      playhead.style.left = x + 'px';
-
-      // Check for overdrive state from timeline regions
-      activeOverdrive = overdrives.some(od => currentTime >= od.start && currentTime <= od.end);
-      // Check for silence state (mutes glitch)
-      activeSilence = silences.some(sil => currentTime >= sil.start && currentTime <= sil.end);
-      // Combine timeline overdrive with spacebar overdrive
-      overdrive = activeOverdrive || spacebarOverdrive;
-    }
-
-    function drawTimeline() {
-      drawWaveform();
-      drawTransitions();
-      drawOverdrives();
-      drawSilences();
-      drawSegment();
-      updatePlayhead();
-      updateSegmentDuration();
-    }
-
-    function getCurrentTime() {
-      if (!audioContext) return 0;
-      if (isPlaying) {
-        return playOffset + (audioContext.currentTime - playStartTime);
-      }
-      return playOffset;
-    }
-
-    function updateTimeDisplay() {
-      const time = getCurrentTime();
-      const mins = Math.floor(time / 60);
-      const secs = Math.floor(time % 60);
-      document.getElementById('timeDisplay').textContent =
-        `${mins}:${secs.toString().padStart(2, '0')}`;
-    }
-
-    function updateSegmentDuration() {
-      const duration = playbackSegment.end - playbackSegment.start;
-      const mins = Math.floor(duration / 60);
-      const secs = Math.floor(duration % 60);
-      document.getElementById('segmentDuration').textContent =
-        `${mins}:${secs.toString().padStart(2, '0')}`;
-    }
-
-    let stoppingManually = false;  // flag to distinguish manual stop from natural end
-
-    function play() {
-      if (!audioBuffer || isPlaying) return;
-
-      // Deselect any selected marker on play
-      if (selectedMarker) {
-        selectedMarker = null;
-        drawTimeline();
-      }
-
-      // Resume context if suspended (autoplay policy)
-      if (audioContext.state === 'suspended') {
-        audioContext.resume();
-      }
-
-      // Ensure playOffset is within segment bounds
-      if (playOffset < playbackSegment.start || playOffset >= playbackSegment.end) {
-        playOffset = playbackSegment.start;
-      }
-
-      audioSource = audioContext.createBufferSource();
-      audioSource.buffer = audioBuffer;
-      audioSource.connect(audioContext.destination);
-
-      audioSource.onended = () => {
-        if (stoppingManually) {
-          stoppingManually = false;
-          return;
-        }
-        // Natural end of playback
-        isPlaying = false;
-        playOffset = playbackSegment.start;  // Reset to segment start
-        document.getElementById('playBtn').textContent = '▶';
-      };
-
-      playStartTime = audioContext.currentTime;
-      audioSource.start(0, playOffset);
-      isPlaying = true;
-      document.getElementById('playBtn').textContent = '❚❚';
-    }
-
-    function pause() {
-      if (!isPlaying) return;
-
-      playOffset = getCurrentTime();
-      stoppingManually = true;
-      audioSource.stop();
-      audioSource = null;
-      isPlaying = false;
-      document.getElementById('playBtn').textContent = '▶';
-    }
-
-    function togglePlayPause() {
-      if (isPlaying) {
-        pause();
-      } else {
-        play();
-      }
-    }
-
-    function seekTo(time) {
-      const wasPlaying = isPlaying;
-      if (wasPlaying) {
-        pause();
-      }
-      // Constrain to segment bounds
-      playOffset = Math.max(playbackSegment.start, Math.min(time, playbackSegment.end));
-
-      // Jump animation state to match new time
-      jumpToState(playOffset);
-
-      if (wasPlaying) {
-        play();
-      }
-      updateTimeDisplay();
-      drawTimeline();
-    }
-
-    function showBeatIndicator(beat, originalBeat, x) {
-      const indicator = document.getElementById('beatIndicator');
-      const offset = beat - originalBeat;
-      let text;
-      if (offset === 0) {
-        text = String(beat);
-      } else if (offset > 0) {
-        text = `${beat} +${offset}`;
-      } else {
-        text = `${beat} ${offset}`;
-      }
-      indicator.textContent = text;
-      indicator.style.left = x + 'px';
-      indicator.classList.add('visible');
-    }
-
-    function hideBeatIndicator() {
-      const indicator = document.getElementById('beatIndicator');
-      indicator.classList.remove('visible');
-    }
-
-    function setupTimeline() {
-      const transitionsTrack = document.getElementById('transitionsTrack');
-      const overdrivesTrack = document.getElementById('overdrivesTrack');
-      const waveformTrack = document.getElementById('waveformTrack');
-      const tracks = document.getElementById('timelineTracks');
-      const playBtn = document.getElementById('playBtn');
-
-      // BPM controls
-      const bpmInput = document.getElementById('bpmInput');
-      const offsetInput = document.getElementById('offsetInput');
-      const tapOffsetBtn = document.getElementById('tapOffsetBtn');
-
-      playBtn.addEventListener('click', togglePlayPause);
-
-      // Space bar to play/pause
-      window.addEventListener('keydown', (e) => {
-        if (e.code === 'Space' && e.target === document.body) {
-          e.preventDefault();
-          togglePlayPause();
-        }
-      });
-
-      // BPM input handler - preserve beat positions, recalculate times
-      bpmInput.addEventListener('change', (e) => {
-        bpm = Math.max(60, Math.min(240, parseInt(e.target.value) || 153));
-        e.target.value = bpm;
-        beatMs = 60000 / bpm;
-        if (audioDuration) {
-          recalculateTimesFromBeats();
-          drawTimeline();
-          saveState();
-        }
-      });
-
-      // Offset input handler - preserve beat positions, recalculate times
-      offsetInput.addEventListener('change', (e) => {
-        bpmOffset = Math.max(0, parseFloat(e.target.value) || 0);
-        e.target.value = bpmOffset.toFixed(2);
-        if (audioDuration) {
-          recalculateTimesFromBeats();
-          drawTimeline();
-          saveState();
-        }
-      });
-
-      // Tap to set offset from current playhead
-      tapOffsetBtn.addEventListener('click', () => {
-        bpmOffset = getCurrentTime();
-        offsetInput.value = bpmOffset.toFixed(2);
-        if (audioDuration) {
-          recalculateTimesFromBeats();
-          drawTimeline();
-          saveState();
-        }
-      });
-
-      // Gap ratio slider - redistributes markers (intentional reset)
-      const gapSlider = document.getElementById('gapSlider');
-      gapSlider.addEventListener('input', (e) => {
-        gapRatio = parseInt(e.target.value);
-        if (audioDuration && transitions.length > 0) {
-          redistributeMarkers();
-          drawTimeline();
-        }
-      });
-      // Save on release (not every input event)
-      gapSlider.addEventListener('change', () => {
-        if (audioDuration) saveState();
-      });
-
-      // Helper functions
-      const getTimeFromX = (x, width) => (x / width) * audioDuration;
-      const getXFromTime = (t, width) => (t / audioDuration) * width;
-
-      // Hit test for transitions
-      function hitTestTransitions(x, width) {
-        const hitRadius = 8;
-        for (let i = 0; i < transitions.length; i++) {
-          const tr = transitions[i];
-          const startX = getXFromTime(tr.start, width);
-          const endX = getXFromTime(tr.end, width);
-
-          // Only allow resize handles if this marker is selected
-          const isSelected = selectedMarker && selectedMarker.type === 'tr' && selectedMarker.index === i;
-          if (isSelected) {
-            if (Math.abs(x - startX) < hitRadius) {
-              return { type: 'tr-start', index: i };
-            }
-            if (Math.abs(x - endX) < hitRadius) {
-              return { type: 'tr-end', index: i };
-            }
-          }
-          if (x > startX - hitRadius && x < endX + hitRadius) {
-            return { type: 'tr-move', index: i };
-          }
-        }
-        return null;
-      }
-
-      // Hit test for overdrives
-      function hitTestOverdrives(x, width) {
-        const hitRadius = 8;
-        for (let i = 0; i < overdrives.length; i++) {
-          const od = overdrives[i];
-          const startX = getXFromTime(od.start, width);
-          const endX = getXFromTime(od.end, width);
-
-          // Only allow resize handles if this marker is selected
-          const isSelected = selectedMarker && selectedMarker.type === 'od' && selectedMarker.index === i;
-          if (isSelected) {
-            if (Math.abs(x - startX) < hitRadius) {
-              return { type: 'od-start', index: i };
-            }
-            if (Math.abs(x - endX) < hitRadius) {
-              return { type: 'od-end', index: i };
-            }
-          }
-          if (x > startX - hitRadius && x < endX + hitRadius) {
-            return { type: 'od-move', index: i };
-          }
-        }
-        return null;
-      }
-
-      // Hit test for silences
-      function hitTestSilences(x, width) {
-        const hitRadius = 8;
-        for (let i = 0; i < silences.length; i++) {
-          const sil = silences[i];
-          const startX = getXFromTime(sil.start, width);
-          const endX = getXFromTime(sil.end, width);
-
-          const isSelected = selectedMarker && selectedMarker.type === 'sil' && selectedMarker.index === i;
-          if (isSelected) {
-            if (Math.abs(x - startX) < hitRadius) {
-              return { type: 'sil-start', index: i };
-            }
-            if (Math.abs(x - endX) < hitRadius) {
-              return { type: 'sil-end', index: i };
-            }
-          }
-          if (x > startX - hitRadius && x < endX + hitRadius) {
-            return { type: 'sil-move', index: i };
-          }
-        }
-        return null;
-      }
-
-      // Hit test for playback segment
-      function hitTestSegment(x, width) {
-        const hitRadius = 8;
-        const startX = getXFromTime(playbackSegment.start, width);
-        const endX = getXFromTime(playbackSegment.end, width);
-
-        // Only allow resize handles if segment is selected
-        const isSelected = selectedMarker && selectedMarker.type === 'seg';
-        if (isSelected) {
-          if (Math.abs(x - startX) < hitRadius) {
-            return { type: 'seg-start' };
-          }
-          if (Math.abs(x - endX) < hitRadius) {
-            return { type: 'seg-end' };
-          }
-        }
-        if (x > startX - hitRadius && x < endX + hitRadius) {
-          return { type: 'seg-move' };
-        }
-        return null;
-      }
-
-      let didDrag = false;
-      const segmentTrack = document.getElementById('segmentTrack');
-
-      // Cmd+drag = PUSH (create space in drag direction)
-      // Option+drag = PULL (remove space from drag direction)
-      tracks.addEventListener('mousedown', (e) => {
-        if (!audioDuration) return;
-        if (!e.metaKey && !e.altKey) return;
-
-        e.preventDefault();
-        const trackRect = waveformTrack.getBoundingClientRect();
-        const x = e.clientX - trackRect.left;
-        const clickBeat = timeToBeat(getTimeFromX(x, trackRect.width));
-
-        dragging = {
-          type: e.metaKey ? 'push' : 'pull',
-          clickBeat: clickBeat,
-          // Store original positions
-          originalTransitions: transitions.map(tr => ({
-            startBeat: tr.startBeat,
-            endBeat: tr.endBeat
-          })),
-          originalOverdrives: overdrives.map(od => ({
-            startBeat: od.startBeat,
-            endBeat: od.endBeat
-          })),
-          originalSegment: {
-            startBeat: playbackSegment.startBeat,
-            endBeat: playbackSegment.endBeat
-          }
-        };
-        tracks.style.cursor = 'ew-resize';
-      });
-
-      // Transitions track
-      transitionsTrack.addEventListener('mousedown', (e) => {
-        if (e.metaKey || e.altKey) return;  // Let modifier+drag bubble to tracks handler
-        if (!audioDuration) return;
-
-        const rect = transitionsTrack.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        didDrag = false;
-        dragStartX = e.clientX; dragStartY = e.clientY;
-
-        const hit = hitTestTransitions(x, rect.width);
-
-        // If something is selected, deselect unless clicking resize handle of selected marker
-        if (selectedMarker) {
-          const isResizeHandle = hit && (hit.type === 'tr-start' || hit.type === 'tr-end');
-          if (!isResizeHandle) {
-            selectedMarker = null;
-            drawTimeline();
-            return;
-          }
-        }
-
-        if (hit) {
-          e.preventDefault();
-          const tr = transitions[hit.index];
-          if (hit.type === 'tr-move') {
-            const mouseDownTime = getTimeFromX(x, rect.width);
-            dragging = {
-              type: 'tr-move',
-              index: hit.index,
-              originalStartBeat: tr.startBeat,
-              originalEndBeat: tr.endBeat,
-              grabOffsetBeats: timeToBeat(mouseDownTime) - tr.startBeat
-            };
-            transitionsTrack.style.cursor = 'grabbing';
-          } else {
-            dragging = {
-              type: hit.type,
-              index: hit.index,
-              originalBeat: hit.type === 'tr-start' ? tr.startBeat : tr.endBeat
-            };
-            transitionsTrack.style.cursor = 'ew-resize';
-          }
-        }
-      });
-
-      transitionsTrack.addEventListener('mousemove', (e) => {
-        if (dragging) return;
-        const rect = transitionsTrack.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const hit = hitTestTransitions(x, rect.width);
-        if (hit) {
-          transitionsTrack.style.cursor = hit.type === 'tr-move' ? 'grab' : 'ew-resize';
-        } else {
-          transitionsTrack.style.cursor = 'default';
-        }
-      });
-
-      // Overdrives track
-      overdrivesTrack.addEventListener('mousedown', (e) => {
-        if (e.metaKey || e.altKey) return;  // Let modifier+drag bubble to tracks handler
-        if (!audioDuration) return;
-
-        const rect = overdrivesTrack.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        didDrag = false;
-        dragStartX = e.clientX; dragStartY = e.clientY;
-
-        const hit = hitTestOverdrives(x, rect.width);
-
-        // If something is selected, deselect unless clicking resize handle of selected marker
-        if (selectedMarker) {
-          const isResizeHandle = hit && (hit.type === 'od-start' || hit.type === 'od-end');
-          if (!isResizeHandle) {
-            selectedMarker = null;
-            drawTimeline();
-            didDrag = true;  // Prevent mouseup from adding new overdrive
-            return;
-          }
-        }
-        if (hit) {
-          e.preventDefault();
-          const od = overdrives[hit.index];
-          if (hit.type === 'od-move') {
-            const mouseDownTime = getTimeFromX(x, rect.width);
-            dragging = {
-              type: 'od-move',
-              index: hit.index,
-              originalStartBeat: od.startBeat,
-              originalEndBeat: od.endBeat,
-              grabOffsetBeats: timeToBeat(mouseDownTime) - od.startBeat
-            };
-            overdrivesTrack.style.cursor = 'grabbing';
-          } else {
-            dragging = {
-              type: hit.type,
-              index: hit.index,
-              originalBeat: hit.type === 'od-start' ? od.startBeat : od.endBeat
-            };
-            overdrivesTrack.style.cursor = 'ew-resize';
-          }
-        }
-      });
-
-      overdrivesTrack.addEventListener('mousemove', (e) => {
-        if (dragging) return;
-        const rect = overdrivesTrack.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const hit = hitTestOverdrives(x, rect.width);
-        if (hit) {
-          overdrivesTrack.style.cursor = hit.type === 'od-move' ? 'grab' : 'ew-resize';
-        } else {
-          overdrivesTrack.style.cursor = 'crosshair';
-        }
-      });
-
-      // Segment track
-      segmentTrack.addEventListener('mousedown', (e) => {
-        if (e.metaKey || e.altKey) return;  // Let modifier+drag bubble to tracks handler
-        if (!audioDuration) return;
-
-        const rect = segmentTrack.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        didDrag = false;
-        dragStartX = e.clientX; dragStartY = e.clientY;
-
-        const hit = hitTestSegment(x, rect.width);
-
-        // If something is selected, deselect unless clicking resize handle of selected marker
-        if (selectedMarker) {
-          const isResizeHandle = hit && (hit.type === 'seg-start' || hit.type === 'seg-end');
-          if (!isResizeHandle) {
-            selectedMarker = null;
-            drawTimeline();
-            return;
-          }
-        }
-        if (hit) {
-          e.preventDefault();
-          if (hit.type === 'seg-move') {
-            const mouseDownTime = getTimeFromX(x, rect.width);
-            dragging = {
-              type: 'seg-move',
-              originalStartBeat: playbackSegment.startBeat,
-              originalEndBeat: playbackSegment.endBeat,
-              grabOffsetBeats: timeToBeat(mouseDownTime) - playbackSegment.startBeat
-            };
-            segmentTrack.style.cursor = 'grabbing';
-          } else {
-            dragging = {
-              type: hit.type,
-              originalBeat: hit.type === 'seg-start' ? playbackSegment.startBeat : playbackSegment.endBeat
-            };
-            segmentTrack.style.cursor = 'ew-resize';
-          }
-        }
-      });
-
-      segmentTrack.addEventListener('mousemove', (e) => {
-        if (dragging) return;
-        const rect = segmentTrack.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const hit = hitTestSegment(x, rect.width);
-        if (hit) {
-          segmentTrack.style.cursor = hit.type === 'seg-move' ? 'grab' : 'ew-resize';
-        } else {
-          segmentTrack.style.cursor = 'default';
-        }
-      });
-
-      // Waveform track - seeking and scrubbing
-      let scrubbingWaveform = false;
-
-      waveformTrack.addEventListener('mousedown', (e) => {
-        if (!audioDuration) return;
-        e.preventDefault();
-        scrubbingWaveform = true;
-        waveformTrack.style.cursor = 'grabbing';
-
-        // Deselect any marker when clicking waveform
-        if (selectedMarker) {
-          selectedMarker = null;
-          drawTimeline();
-        }
-
-        const rect = waveformTrack.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const time = getTimeFromX(x, rect.width);
-        seekTo(time);
-      });
-
-      window.addEventListener('mousemove', (e) => {
-        if (!scrubbingWaveform) return;
-
-        const rect = waveformTrack.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const time = Math.max(0, Math.min(audioDuration, getTimeFromX(x, rect.width)));
-        seekTo(time);
-      });
-
-      window.addEventListener('mouseup', () => {
-        if (scrubbingWaveform) {
-          scrubbingWaveform = false;
-          waveformTrack.style.cursor = '';
-        }
-      });
-
-      // Overdrives track - click empty space to add new overdrive
-      overdrivesTrack.addEventListener('mouseup', (e) => {
-        if (!didDrag && !dragging && audioDuration) {
-          const rect = overdrivesTrack.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const time = getTimeFromX(x, rect.width);
-
-          // Check if click was on existing overdrive (don't add new one)
-          const hit = hitTestOverdrives(x, rect.width);
-          if (!hit) {
-            // Add new 4-beat overdrive centered on click position
-            const clickBeat = timeToBeat(time);
-            const startBeat = Math.max(0, clickBeat - 2);
-            const endBeat = startBeat + 4;
-
-            overdrives.push({
-              start: beatToTime(startBeat),
-              end: beatToTime(endBeat),
-              startBeat: startBeat,
-              endBeat: endBeat
-            });
-
-            drawOverdrives();
-            saveState();
-          }
-        }
-      });
-
-
-      // Double-click overdrive to remove it
-      overdrivesTrack.addEventListener('dblclick', (e) => {
-        if (!audioDuration) return;
-        const rect = overdrivesTrack.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const hit = hitTestOverdrives(x, rect.width);
-        if (hit) {
-          overdrives.splice(hit.index, 1);
-          // Clear selection if removed marker was selected
-          if (selectedMarker && selectedMarker.type === 'od' && selectedMarker.index === hit.index) {
-            selectedMarker = null;
-          } else if (selectedMarker && selectedMarker.type === 'od' && selectedMarker.index > hit.index) {
-            selectedMarker.index--;  // Adjust index after removal
-          }
-          drawOverdrives();
-          saveState();
-        }
-      });
-
-      // Silences track
-      const silencesTrack = document.getElementById('silencesTrack');
-
-      silencesTrack.addEventListener('mousedown', (e) => {
-        if (e.metaKey || e.altKey) return;
-        if (!audioDuration) return;
-
-        const rect = silencesTrack.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        didDrag = false;
-        dragStartX = e.clientX; dragStartY = e.clientY;
-
-        const hit = hitTestSilences(x, rect.width);
-
-        if (selectedMarker) {
-          const isResizeHandle = hit && (hit.type === 'sil-start' || hit.type === 'sil-end');
-          if (!isResizeHandle) {
-            selectedMarker = null;
-            drawTimeline();
-            didDrag = true;
-            return;
-          }
-        }
-        if (hit) {
-          e.preventDefault();
-          const sil = silences[hit.index];
-          if (hit.type === 'sil-move') {
-            const mouseDownTime = getTimeFromX(x, rect.width);
-            dragging = {
-              type: 'sil-move',
-              index: hit.index,
-              originalStartBeat: sil.startBeat,
-              originalEndBeat: sil.endBeat,
-              grabOffsetBeats: timeToBeat(mouseDownTime) - sil.startBeat
-            };
-            silencesTrack.style.cursor = 'grabbing';
-          } else {
-            dragging = {
-              type: hit.type,
-              index: hit.index,
-              originalBeat: hit.type === 'sil-start' ? sil.startBeat : sil.endBeat
-            };
-            silencesTrack.style.cursor = 'ew-resize';
-          }
-        }
-      });
-
-      silencesTrack.addEventListener('mousemove', (e) => {
-        if (dragging) return;
-        const rect = silencesTrack.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const hit = hitTestSilences(x, rect.width);
-        if (hit) {
-          silencesTrack.style.cursor = hit.type === 'sil-move' ? 'grab' : 'ew-resize';
-        } else {
-          silencesTrack.style.cursor = 'crosshair';
-        }
-      });
-
-      // Click empty space to add new silence
-      silencesTrack.addEventListener('mouseup', (e) => {
-        if (!didDrag && !dragging && audioDuration) {
-          const rect = silencesTrack.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const time = getTimeFromX(x, rect.width);
-
-          const hit = hitTestSilences(x, rect.width);
-          if (!hit) {
-            const clickBeat = timeToBeat(time);
-            const startBeat = Math.max(0, clickBeat - 2);
-            const endBeat = startBeat + 4;
-
-            silences.push({
-              start: beatToTime(startBeat),
-              end: beatToTime(endBeat),
-              startBeat: startBeat,
-              endBeat: endBeat
-            });
-
-            drawSilences();
-            saveState();
-          }
-        }
-      });
-
-      // Double-click silence to remove it
-      silencesTrack.addEventListener('dblclick', (e) => {
-        if (!audioDuration) return;
-        const rect = silencesTrack.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const hit = hitTestSilences(x, rect.width);
-        if (hit) {
-          silences.splice(hit.index, 1);
-          if (selectedMarker && selectedMarker.type === 'sil' && selectedMarker.index === hit.index) {
-            selectedMarker = null;
-          } else if (selectedMarker && selectedMarker.type === 'sil' && selectedMarker.index > hit.index) {
-            selectedMarker.index--;
-          }
-          drawSilences();
-          saveState();
-        }
-      });
-
-      // Global mousemove for dragging (with beat snapping)
-      window.addEventListener('mousemove', (e) => {
-        if (!dragging) return;
-
-        // Only count as drag after moving past threshold (prevents accidental drags during clicks)
-        if (!didDrag) {
-          const dx = e.clientX - dragStartX;
-          const dy = e.clientY - dragStartY;
-          if (dx * dx + dy * dy < DRAG_THRESHOLD * DRAG_THRESHOLD) return;
-          didDrag = true;
-        }
-        const rect = tracks.getBoundingClientRect();
-        const trackRect = waveformTrack.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const trackX = e.clientX - trackRect.left;
-        const time = getTimeFromX(trackX, trackRect.width);
-        const beat = timeToBeat(time);
-
-        // Calculate indicator position (viewport-relative, since timeline-panel is fixed at left:0)
-        const indicatorX = trackRect.left + (time / audioDuration) * trackRect.width;
-
-        if (dragging.type === 'tr-start') {
-          const tr = transitions[dragging.index];
-          const idx = dragging.index;
-          // Min: previous transition's end (or 0)
-          const minBeat = idx > 0 ? transitions[idx - 1].endBeat + MIN_BEATS_BETWEEN : 0;
-          // Max: current end minus minimum duration (lock + unlock)
-          const minDuration = tr.lockBeats + tr.unlockBeats;
-          const maxBeat = tr.endBeat - minDuration;
-          const newBeat = Math.max(minBeat, Math.min(maxBeat, beat));
-          tr.startBeat = newBeat;
-          tr.start = beatToTime(newBeat);
-          showBeatIndicator(newBeat, dragging.originalBeat, indicatorX);
-          drawTransitions();
-        } else if (dragging.type === 'tr-end') {
-          const tr = transitions[dragging.index];
-          const idx = dragging.index;
-          // Min: start plus minimum duration
-          const minDuration = tr.lockBeats + tr.unlockBeats;
-          const minBeat = tr.startBeat + minDuration;
-          // Max: next transition's start (or audio end)
-          const maxBeat = idx < transitions.length - 1 ? transitions[idx + 1].startBeat - MIN_BEATS_BETWEEN : timeToBeat(audioDuration);
-          const newBeat = Math.max(minBeat, Math.min(maxBeat, beat));
-          tr.endBeat = newBeat;
-          tr.end = beatToTime(newBeat);
-          showBeatIndicator(newBeat, dragging.originalBeat, indicatorX);
-          drawTransitions();
-        } else if (dragging.type === 'tr-move') {
-          const tr = transitions[dragging.index];
-          const idx = dragging.index;
-          const duration = dragging.originalEndBeat - dragging.originalStartBeat;
-          const newStartBeat = beat - dragging.grabOffsetBeats;
-
-          // Check if we're hitting adjacent markers
-          const prevEnd = idx > 0 ? transitions[idx - 1].endBeat : playbackSegment.startBeat + 6;
-          const nextStart = idx < transitions.length - 1 ? transitions[idx + 1].startBeat : playbackSegment.endBeat - 6;
-
-          const movingRight = newStartBeat > tr.startBeat;
-          const movingLeft = newStartBeat < tr.startBeat;
-          const newEndBeat = newStartBeat + duration;
-
-          // Check if we're pushing against next/previous marker
-          const hitsNext = movingRight && newEndBeat >= nextStart - MIN_BEATS_BETWEEN && idx < transitions.length - 1;
-          const hitsPrev = movingLeft && newStartBeat <= prevEnd + MIN_BEATS_BETWEEN && idx > 0;
-
-          if (hitsNext) {
-            // Push everything to the right with compression
-            const desiredEnd = newEndBeat;
-            const currentEnd = tr.endBeat;
-            const delta = desiredEnd - currentEnd;
-
-            // Push markers after this one FIRST (before moving this marker)
-            if (delta > 0) {
-              pushTransitionsWithCompression(0, delta, idx + 1);
-            }
-
-            // Now move this marker, but constrain to not overlap with pushed markers
-            const maxEnd = idx < transitions.length - 1
-              ? transitions[idx + 1].startBeat - MIN_BEATS_BETWEEN
-              : playbackSegment.endBeat - 6;
-            const clampedEnd = Math.min(newEndBeat, maxEnd);
-            const clampedStart = clampedEnd - duration;
-
-            tr.startBeat = clampedStart;
-            tr.endBeat = clampedEnd;
-            tr.start = beatToTime(tr.startBeat);
-            tr.end = beatToTime(tr.endBeat);
-
-            showBeatIndicator(clampedStart, dragging.originalStartBeat, indicatorX);
-            drawTransitions();
-          } else if (hitsPrev) {
-            // Push everything to the left with compression
-            const desiredStart = newStartBeat;
-            const currentStart = tr.startBeat;
-            const delta = desiredStart - currentStart; // negative since moving left
-
-            // Push markers before this one FIRST (before moving this marker)
-            if (delta < 0) {
-              pushTransitionsWithCompression(0, delta, idx - 1);
-            }
-
-            // Now move this marker, but constrain to not overlap with pushed markers
-            const minStart = idx > 0
-              ? transitions[idx - 1].endBeat + MIN_BEATS_BETWEEN
-              : playbackSegment.startBeat + 6;
-            const clampedStart = Math.max(newStartBeat, minStart);
-            const clampedEnd = clampedStart + duration;
-
-            tr.startBeat = clampedStart;
-            tr.endBeat = clampedEnd;
-            tr.start = beatToTime(tr.startBeat);
-            tr.end = beatToTime(tr.endBeat);
-
-            showBeatIndicator(clampedStart, dragging.originalStartBeat, indicatorX);
-            drawTransitions();
-          } else {
-            // Normal move within gaps - constrain to available space
-            const minBeat = idx > 0 ? transitions[idx - 1].endBeat + MIN_BEATS_BETWEEN : playbackSegment.startBeat + 6;
-            const maxBeat = idx < transitions.length - 1
-              ? transitions[idx + 1].startBeat - MIN_BEATS_BETWEEN - duration
-              : playbackSegment.endBeat - 6 - duration;
-            const clampedStart = Math.max(minBeat, Math.min(maxBeat, newStartBeat));
-            tr.startBeat = clampedStart;
-            tr.endBeat = clampedStart + duration;
-            tr.start = beatToTime(tr.startBeat);
-            tr.end = beatToTime(tr.endBeat);
-            showBeatIndicator(clampedStart, dragging.originalStartBeat, indicatorX);
-            drawTransitions();
-          }
-        } else if (dragging.type === 'od-start') {
-          const od = overdrives[dragging.index];
-          const newBeat = Math.max(0, Math.min(od.endBeat - 1, beat));
-          od.startBeat = newBeat;
-          od.start = beatToTime(newBeat);
-          showBeatIndicator(newBeat, dragging.originalBeat, indicatorX);
-          drawOverdrives();
-        } else if (dragging.type === 'od-end') {
-          const od = overdrives[dragging.index];
-          const newBeat = Math.max(od.startBeat + 1, Math.min(timeToBeat(audioDuration), beat));
-          od.endBeat = newBeat;
-          od.end = beatToTime(newBeat);
-          showBeatIndicator(newBeat, dragging.originalBeat, indicatorX);
-          drawOverdrives();
-        } else if (dragging.type === 'od-move') {
-          const od = overdrives[dragging.index];
-          const duration = dragging.originalEndBeat - dragging.originalStartBeat;
-          const newStartBeat = beat - dragging.grabOffsetBeats;
-          const clampedStart = Math.max(0, Math.min(timeToBeat(audioDuration) - duration, newStartBeat));
-          od.startBeat = clampedStart;
-          od.endBeat = clampedStart + duration;
-          od.start = beatToTime(od.startBeat);
-          od.end = beatToTime(od.endBeat);
-          showBeatIndicator(clampedStart, dragging.originalStartBeat, indicatorX);
-          drawOverdrives();
-        } else if (dragging.type === 'sil-start') {
-          const sil = silences[dragging.index];
-          const newBeat = Math.max(0, Math.min(sil.endBeat - 1, beat));
-          sil.startBeat = newBeat;
-          sil.start = beatToTime(newBeat);
-          showBeatIndicator(newBeat, dragging.originalBeat, indicatorX);
-          drawSilences();
-        } else if (dragging.type === 'sil-end') {
-          const sil = silences[dragging.index];
-          const newBeat = Math.max(sil.startBeat + 1, Math.min(timeToBeat(audioDuration), beat));
-          sil.endBeat = newBeat;
-          sil.end = beatToTime(newBeat);
-          showBeatIndicator(newBeat, dragging.originalBeat, indicatorX);
-          drawSilences();
-        } else if (dragging.type === 'sil-move') {
-          const sil = silences[dragging.index];
-          const duration = dragging.originalEndBeat - dragging.originalStartBeat;
-          const newStartBeat = beat - dragging.grabOffsetBeats;
-          const clampedStart = Math.max(0, Math.min(timeToBeat(audioDuration) - duration, newStartBeat));
-          sil.startBeat = clampedStart;
-          sil.endBeat = clampedStart + duration;
-          sil.start = beatToTime(sil.startBeat);
-          sil.end = beatToTime(sil.endBeat);
-          showBeatIndicator(clampedStart, dragging.originalStartBeat, indicatorX);
-          drawSilences();
-        } else if (dragging.type === 'seg-start') {
-          // Minimum segment size based on transitions
-          const minSegmentBeats = calculateMinSegmentBeats();
-          const maxBeat = playbackSegment.endBeat - minSegmentBeats;
-          const newBeat = Math.max(0, Math.min(maxBeat, beat));
-          playbackSegment.startBeat = newBeat;
-          playbackSegment.start = beatToTime(newBeat);
-          showBeatIndicator(newBeat, dragging.originalBeat, indicatorX);
-          redistributeMarkers();
-          drawTimeline();
-        } else if (dragging.type === 'seg-end') {
-          const minSegmentBeats = calculateMinSegmentBeats();
-          const minBeat = playbackSegment.startBeat + minSegmentBeats;
-          const newBeat = Math.max(minBeat, Math.min(timeToBeat(audioDuration), beat));
-          playbackSegment.endBeat = newBeat;
-          playbackSegment.end = beatToTime(newBeat);
-          showBeatIndicator(newBeat, dragging.originalBeat, indicatorX);
-          redistributeMarkers();
-          drawTimeline();
-        } else if (dragging.type === 'seg-move') {
-          const duration = dragging.originalEndBeat - dragging.originalStartBeat;
-          const newStartBeat = beat - dragging.grabOffsetBeats;
-          const clampedStart = Math.max(0, Math.min(timeToBeat(audioDuration) - duration, newStartBeat));
-          const delta = clampedStart - playbackSegment.startBeat;
-
-          playbackSegment.startBeat = clampedStart;
-          playbackSegment.endBeat = clampedStart + duration;
-          playbackSegment.start = beatToTime(playbackSegment.startBeat);
-          playbackSegment.end = beatToTime(playbackSegment.endBeat);
-
-          // Move all transitions by the same delta
-          for (const tr of transitions) {
-            tr.startBeat += delta;
-            tr.endBeat += delta;
-            tr.start = beatToTime(tr.startBeat);
-            tr.end = beatToTime(tr.endBeat);
-          }
-
-          showBeatIndicator(clampedStart, dragging.originalStartBeat, indicatorX);
-          drawTimeline();
-        } else if (dragging.type === 'push') {
-          const delta = beat - dragging.clickBeat;
-          // Reset to original positions first
-          for (let i = 0; i < transitions.length; i++) {
-            const orig = dragging.originalTransitions[i];
-            transitions[i].startBeat = orig.startBeat;
-            transitions[i].endBeat = orig.endBeat;
-            transitions[i].start = beatToTime(orig.startBeat);
-            transitions[i].end = beatToTime(orig.endBeat);
-          }
-          // Then push with compression
-          pushTransitionsWithCompression(dragging.clickBeat, delta);
-          showBeatIndicator(beat, dragging.clickBeat, indicatorX);
-          drawTimeline();
-        } else if (dragging.type === 'pull') {
-          const delta = beat - dragging.clickBeat;
-          const clickBeat = dragging.clickBeat;
-
-          // Pull: items from drag direction move toward click
-          for (let i = 0; i < transitions.length; i++) {
-            const orig = dragging.originalTransitions[i];
-            let newStart = orig.startBeat;
-            let newEnd = orig.endBeat;
-
-            if (delta > 0) {
-              // Dragging right: pull items from right toward click
-              if (orig.startBeat > clickBeat) newStart = Math.max(clickBeat, orig.startBeat - delta);
-              if (orig.endBeat > clickBeat) newEnd = Math.max(clickBeat, orig.endBeat - delta);
-            } else {
-              // Dragging left: pull items from left toward click
-              if (orig.startBeat < clickBeat) newStart = Math.min(clickBeat, orig.startBeat - delta);
-              if (orig.endBeat < clickBeat) newEnd = Math.min(clickBeat, orig.endBeat - delta);
-            }
-
-            // Ensure minimum duration
-            if (newEnd - newStart < DURATION_FLOOR) {
-              if (newStart !== orig.startBeat) newStart = newEnd - DURATION_FLOOR;
-              else newEnd = newStart + DURATION_FLOOR;
-            }
-
-            transitions[i].startBeat = Math.max(0, newStart);
-            transitions[i].endBeat = newEnd;
-            transitions[i].start = beatToTime(transitions[i].startBeat);
-            transitions[i].end = beatToTime(transitions[i].endBeat);
-          }
-
-          showBeatIndicator(beat, dragging.clickBeat, indicatorX);
-          drawTimeline();
-        }
-      });
-
-      // Global mouseup to end dragging
-      window.addEventListener('mouseup', () => {
-        if (dragging) {
-          // If clicked without dragging, toggle selection
-          if (!didDrag) {
-            const clickedType = dragging.type.startsWith('tr-') ? 'tr' :
-                               dragging.type.startsWith('od-') ? 'od' :
-                               dragging.type.startsWith('sil-') ? 'sil' :
-                               dragging.type.startsWith('seg-') ? 'seg' : null;
-            const clickedIndex = dragging.index;
-
-            if (clickedType) {
-              // Toggle selection
-              if (selectedMarker && selectedMarker.type === clickedType && selectedMarker.index === clickedIndex) {
-                selectedMarker = null;  // Deselect
-              } else {
-                selectedMarker = { type: clickedType, index: clickedIndex };
-              }
-              drawTimeline();
-            }
-          }
-          // Save state if we actually dragged something
-          if (didDrag) {
-            saveState();
-          }
-          dragging = null;
-          transitionsTrack.style.cursor = 'default';
-          overdrivesTrack.style.cursor = 'default';
-          silencesTrack.style.cursor = 'default';
-          segmentTrack.style.cursor = 'default';
-          tracks.style.cursor = '';
-          hideBeatIndicator();
-        }
-        didDrag = false;
-      });
-
-      // Redraw on resize
-      window.addEventListener('resize', () => {
-        drawTimeline();
-      });
-    }
-
-    // Timeline animation loop (updates playhead + time display)
-    function animateTimeline() {
-      if (isPlaying) {
-        const currentTime = getCurrentTime();
-        const beatInterval = getBeatInterval();
-
-        // Stop at segment end
-        if (currentTime >= playbackSegment.end) {
-          pause();
-          playOffset = playbackSegment.start;
-          updateTimeDisplay();
-          drawTimeline();
-          requestAnimationFrame(animateTimeline);
-          return;
-        }
-
-        // Check for lock triggers (at start time)
-        for (let i = 0; i < transitions.length; i++) {
-          if (i > lastTriggeredLock && currentTime >= transitions[i].start) {
-            triggerLock(i);
-            lastTriggeredLock = i;
-          }
-        }
-
-        // Check for unlock triggers (at end - unlockDuration)
-        for (let i = 0; i < transitions.length; i++) {
-          const tr = transitions[i];
-          const unlockStartTime = tr.end - tr.unlockBeats * beatInterval;
-          if (i > lastTriggeredUnlock && currentTime >= unlockStartTime) {
-            triggerUnlock(i);
-            lastTriggeredUnlock = i;
-          }
-        }
-
-        updateTimeDisplay();
-        drawTransitions();
-        drawOverdrives();
-        drawSilences();
-        updatePlayhead();
-      }
-      requestAnimationFrame(animateTimeline);
-    }
-
-    // Trigger lock phase for a transition
-    function triggerLock(transitionIndex) {
-      const tr = transitions[transitionIndex];
-      // Lock words on this line
-      if (currentWord < LINES[currentLine].words.length) {
-        lockAllWords();
-      }
-    }
-
-    // Trigger unlock phase for a transition
-    function triggerUnlock(transitionIndex) {
-      // Unlock current line and move to next
-      transitionToNextLine();
-    }
-
-    // Jump to animation state for a given time (instant, no animation)
-    function jumpToState(time) {
-      const beatInterval = getBeatInterval();
-
-      // Find which transition we're currently in (time falls within start..end)
-      let activeTransition = -1;
-      for (let i = transitions.length - 1; i >= 0; i--) {
-        if (time >= transitions[i].start) {
-          activeTransition = i;
-          break;
-        }
-      }
-
-      // Update tracking - find which locks/unlocks have fired
-      lastTriggeredLock = -1;
-      lastTriggeredUnlock = -1;
-      for (let i = 0; i < transitions.length; i++) {
-        if (time >= transitions[i].start) lastTriggeredLock = i;
-        const unlockStart = transitions[i].end - transitions[i].unlockBeats * beatInterval;
-        if (time >= unlockStart) lastTriggeredUnlock = i;
-      }
-
-      // If before all transitions, reset to start
-      if (activeTransition < 0) {
-        clearAnimationTimeouts();
-        letters.forEach(l => {
-          l.isLocked = false;
-          l.targetX = null;
-          l.targetY = null;
-          l.assignment = null;
-        });
-        currentLine = 0;
-        currentWord = 0;
-        if (finaleMode) restoreStrach();
-        updateDebug();
-        updateLineNav();
-        return;
-      }
-
-      // Determine which phase we're in
-      const tr = transitions[activeTransition];
-      const lockEndTime = tr.start + tr.lockBeats * beatInterval;
-      const unlockStartTime = tr.end - tr.unlockBeats * beatInterval;
-
-      if (time < lockEndTime) {
-        // Lock phase - show this line locked
-        const targetLine = Math.min(activeTransition, LINES.length - 1);
-        jumpToLine(targetLine);
-      } else if (time < unlockStartTime) {
-        // Visible phase - text is visible, locked
-        const targetLine = Math.min(activeTransition, LINES.length - 1);
-        jumpToLine(targetLine);
-      } else if (time < tr.end) {
-        // Unlock phase - show cloud, preparing for next line
-        jumpToCloud(activeTransition + 1);
-      } else {
-        // Past this transition - should be in next transition's territory
-        // This case handles gaps between transitions
-        jumpToCloud(activeTransition + 1);
-      }
-    }
-
-    // Jump to cloud state (all letters unlocked, currentLine set but no words locked)
-    function jumpToCloud(lineIndex) {
-      clearAnimationTimeouts();
-
-      const targetLine = Math.min(Math.max(0, lineIndex), LINES.length - 1);
-
-      // Handle Strach visibility
-      const wasFinale = LINES[currentLine]?.isFinale;
-      const willBeFinale = LINES[targetLine]?.isFinale;
-
-      if (!wasFinale && willBeFinale) {
-        dissolveStrach();
-      } else if (wasFinale && !willBeFinale) {
-        restoreStrach();
-      }
-
-      // Release all letters
-      letters.forEach(l => {
-        l.isLocked = false;
-        l.targetX = null;
-        l.targetY = null;
-        l.assignment = null;
-      });
-
-      currentLine = targetLine;
-      currentWord = 0;
-
-      updateDebug();
-      updateLineNav();
-    }
-
-    // Instantly set animation to show a specific line (all words locked)
-    function jumpToLine(targetLine) {
-      // Clear any pending animation timeouts
-      clearAnimationTimeouts();
-
-      // Handle Strach visibility
-      const wasFinale = LINES[currentLine]?.isFinale;
-      const willBeFinale = LINES[targetLine]?.isFinale;
-
-      if (!wasFinale && willBeFinale) {
-        dissolveStrach();
-      } else if (wasFinale && !willBeFinale) {
-        restoreStrach();
-      }
-
-      // Release all letters first
-      letters.forEach(l => {
-        l.isLocked = false;
-        l.targetX = null;
-        l.targetY = null;
-        l.assignment = null;
-      });
-
-      currentLine = targetLine;
-      currentWord = 0;
-
-      // Now lock all words on this line instantly (teleport)
-      lockAllWordsInstant();
-
-      updateDebug();
-      updateLineNav();
-    }
-
-    // Lock all words on current line instantly (no animation delay)
-    function lockAllWordsInstant() {
-      const line = LINES[currentLine];
-      for (let wordIndex = 0; wordIndex < line.words.length; wordIndex++) {
-        lockWord(wordIndex);
-      }
-      currentWord = line.words.length;
-    }
-
-    // ============ END AUDIO/TIMELINE ============
-
-    // Glitch control sliders
-    function setupSliders() {
-      const freqSlider = document.getElementById('glitchFreq');
-      const posSlider = document.getElementById('glitchPos');
-      const opacitySlider = document.getElementById('glitchOpacity');
-      const tearSlider = document.getElementById('glitchTear');
-
-      freqSlider.addEventListener('input', (e) => {
-        glitchFreq = e.target.value / 100;
-        document.getElementById('glitchFreqVal').textContent = e.target.value + '%';
-      });
-
-      posSlider.addEventListener('input', (e) => {
-        glitchPosStrength = e.target.value / 100;
-        document.getElementById('glitchPosVal').textContent = e.target.value;
-      });
-
-      opacitySlider.addEventListener('input', (e) => {
-        glitchOpacityStrength = e.target.value / 100;
-        document.getElementById('glitchOpacityVal').textContent = e.target.value;
-      });
-
-      tearSlider.addEventListener('input', (e) => {
-        glitchTearStrength = e.target.value / 100;
-        document.getElementById('glitchTearVal').textContent = e.target.value;
-      });
-
-      const odSlider = document.getElementById('glitchOD');
-      odSlider.addEventListener('input', (e) => {
-        overdriveMultiplier = parseInt(e.target.value);
-        document.getElementById('glitchODVal').textContent = e.target.value + 'x';
-      });
-    }
-
     document.fonts.ready.then(() => {
-      setupSliders();
-      setupTimeline();
-      initAudio();
-      animateTimeline();
       init();
     });
   </script>

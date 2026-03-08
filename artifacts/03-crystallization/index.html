@@ -69,21 +69,11 @@
             opacity: 0;
         }
         
-        .debug {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            color: #666;
-            font-family: monospace;
-            font-size: 12px;
-            z-index: 1000;
-        }
     </style>
 </head>
 <body>
     <div class="scroll-container"></div>
     <div class="text-container" id="container"></div>
-    <div class="debug" id="debug"></div>
 
     <script>
         const LINES = [
@@ -406,7 +396,6 @@
         function onScroll() {
             const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
             scrollProgress = maxScroll > 0 ? window.scrollY / maxScroll : 0;
-            document.getElementById('debug').textContent = `scroll: ${(scrollProgress * 100).toFixed(1)}% | maxScroll: ${maxScroll} | scrollY: ${window.scrollY}`;
         }
         
         window.addEventListener('scroll', onScroll, { passive: true });

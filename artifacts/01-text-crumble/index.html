@@ -56,14 +56,6 @@
       transition: none;
     }
     
-    .debug {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      color: #666;
-      font-size: 14px;
-      font-family: monospace;
-    }
   </style>
 </head>
 <body>
@@ -72,10 +64,6 @@
     <span class="poem-line"><span class="original">and nothing is lost</span></span>
   </div>
   
-  <div class="debug">
-    <div>scroll: <span id="scroll-val">0</span></div>
-    <div>progress: <span id="progress-val">0</span></div>
-  </div>
 
   <script>
     // ============================================
@@ -230,18 +218,12 @@
     });
     
     // scroll binding
-    const scrollValEl = document.getElementById('scroll-val');
-    const progressValEl = document.getElementById('progress-val');
-    
     let animationFrame;
     
     function onScroll() {
       const scrollY = window.scrollY;
       const maxScroll = document.body.scrollHeight - window.innerHeight;
       const progress = Math.min(1, scrollY / maxScroll);
-      
-      scrollValEl.textContent = Math.round(scrollY);
-      progressValEl.textContent = progress.toFixed(3);
       
       effects.forEach(effect => effect(progress));
     }

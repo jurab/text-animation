@@ -19,15 +19,6 @@
       font-family: 'ADolphin', Georgia, serif;
       overscroll-behavior: none;
     }
-    #info {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      color: #666;
-      font-size: 12px;
-      font-family: monospace;
-      z-index: 100;
-    }
     canvas {
       position: fixed;
       top: 50%;
@@ -42,7 +33,6 @@
   </style>
 </head>
 <body>
-  <div id="info">Loading...</div>
   <div id="measurer"></div>
   <canvas id="canvas"></canvas>
 
@@ -400,13 +390,11 @@
     // ============ MAIN ============
 
     async function init() {
-      const info = document.getElementById('info');
       const canvas = document.getElementById('canvas');
       canvas.width = WIDTH;
       canvas.height = HEIGHT;
       const ctx = canvas.getContext('2d');
 
-      info.textContent = 'Extracting letters...';
       await document.fonts.ready;
 
       const centerX = WIDTH / 2;
@@ -418,11 +406,9 @@
 
       const totalPxA = lettersA.reduce((sum, l) => sum + l.pixels.length, 0);
       const totalPxB = lettersB.reduce((sum, l) => sum + l.pixels.length, 0);
-      info.textContent = `A: ${totalPxA} px, B: ${totalPxB} px`;
 
       // Match pixels with LCS awareness
       const particles = matchLetterPixels(lettersA, lettersB);
-      info.textContent = `${particles.length} particles (${particles.filter(p => p.isMatched).length} matched)`;
 
       // Scroll state
       window.scrollProgress = 0;
@@ -455,8 +441,6 @@
             ctx.fillRect(Math.round(p.x), Math.round(p.y), 1, 1);
           }
         });
-
-        info.textContent = `morph: ${(morphProgress * 100).toFixed(0)}% | scroll: ${(window.scrollProgress * 100).toFixed(0)}%`;
 
         requestAnimationFrame(animate);
       }

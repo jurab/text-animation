@@ -18,16 +18,6 @@
       min-height: 800vh;
       font-family: 'ADolphin', Georgia, serif;
     }
-    #info {
-      position: fixed;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      color: #444;
-      font-size: 12px;
-      font-family: monospace;
-      z-index: 100;
-    }
     canvas {
       position: fixed;
       top: 50%;
@@ -45,7 +35,6 @@
   </style>
 </head>
 <body>
-  <div id="info">Loading...</div>
   <div id="measurer"></div>
   <canvas id="canvas"></canvas>
   
@@ -309,23 +298,19 @@
     // ============ MAIN ============
     
     async function init() {
-      const info = document.getElementById('info');
       const canvas = document.getElementById('canvas');
       canvas.width = WIDTH;
       canvas.height = HEIGHT;
       
-      info.textContent = 'Measuring text...';
       
       // Wait for font
       await document.fonts.ready;
       
       // DOM measurement pass
       const { letters, words, lines } = measureText(TEXT, FONT_SIZE);
-      info.textContent = `Measured ${letters.length} letters, ${words.length} words`;
       
       // Canvas pixel extraction pass
       const totalPixels = extractPixels(letters, FONT_SIZE);
-      info.textContent = `Extracted ${totalPixels} pixels`;
       
       // Create effect
       const render = createRevealEffect(canvas, letters, words);
@@ -341,84 +326,9 @@
       
       window.addEventListener('scroll', onScroll, { passive: true });
       
-      // Drag on visualization to resize window
-      let dragging = false;
-      let dragStartX = 0;
-      let dragStartWindowSize = 0;
-      
-      canvas.addEventListener('mousedown', (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        const x = (e.clientX - rect.left) * scaleX;
-        const y = (e.clientY - rect.top) * scaleY;
-        
-        const bounds = canvas._barBounds;
-        if (bounds && x >= bounds.x && x <= bounds.x + bounds.width && 
-            y >= bounds.y && y <= bounds.y + bounds.height) {
-          dragging = true;
-          dragStartX = x;
-          dragStartWindowSize = PARAMS.windowSize;
-          e.preventDefault();
-        }
-      });
-      
-      canvas.addEventListener('mousemove', (e) => {
-        if (!dragging) return;
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const x = (e.clientX - rect.left) * scaleX;
-        
-        const bounds = canvas._barBounds;
-        const deltaX = x - dragStartX;
-        const deltaNorm = deltaX / bounds.width;
-        
-        // Drag right = larger window, drag left = smaller
-        PARAMS.windowSize = Math.max(0.05, Math.min(1, dragStartWindowSize + deltaNorm));
-      });
-      
-      window.addEventListener('mouseup', () => {
-        dragging = false;
-      });
-      
       function animate() {
         progress += (targetProgress - progress) * 0.1;
         render(progress);
-        
-        // Visualize running window
-        const ctx = canvas.getContext('2d');
-        const windowSize = PARAMS.windowSize;
-        const barWidth = 200;
-        const barHeight = 4;
-        const barX = (WIDTH - barWidth) / 2;
-        const barY = HEIGHT - 30;
-        
-        // Background bar
-        ctx.fillStyle = '#222';
-        ctx.fillRect(barX, barY, barWidth, barHeight);
-        
-        // Window indicator
-        const windowStartPx = barX + Math.max(0, progress - windowSize / 2) * barWidth;
-        const windowEndPx = barX + Math.min(1, progress + windowSize / 2) * barWidth;
-        ctx.fillStyle = '#444';
-        ctx.fillRect(windowStartPx, barY, windowEndPx - windowStartPx, barHeight);
-        
-        // Progress marker
-        ctx.fillStyle = '#888';
-        ctx.fillRect(barX + progress * barWidth - 1, barY - 2, 2, barHeight + 4);
-        
-        // Word position markers
-        ctx.fillStyle = '#666';
-        words.forEach((word, wordIdx) => {
-          const wordPosition = wordIdx / (words.length - 1 || 1);
-          const markerX = barX + wordPosition * barWidth;
-          ctx.fillRect(markerX, barY + barHeight + 2, 1, 3);
-        });
-        
-        // Store bar bounds for drag interaction
-        canvas._barBounds = { x: barX, y: barY - 10, width: barWidth, height: barHeight + 20 };
-        
-        info.textContent = `${(progress * 100).toFixed(0)}% | window: ${Math.round(PARAMS.windowSize * 100)}%`;
         
         requestAnimationFrame(animate);
       }

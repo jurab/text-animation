@@ -20,7 +20,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: #000;
-            overflow: hidden;
+            min-height: 500vh;
             font-family: -apple-system, sans-serif;
         }
         canvas {
@@ -34,88 +34,12 @@
             visibility: hidden;
             white-space: pre;
         }
-        #controls {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: #000;
-            padding: 15px;
-            border-radius: 8px;
-            color: #888;
-            font-size: 12px;
-            z-index: 100;
-            display: none;
-        }
-        #info {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            color: #444;
-            font-size: 11px;
-            font-family: monospace;
-        }
-        #start-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #333;
-            font-size: 14px;
-            font-family: monospace;
-            z-index: 200;
-            background: #000;
-        }
-        .slider-row {
-            display: flex;
-            align-items: center;
-            margin: 8px 0;
-            gap: 10px;
-        }
-        .slider-row label {
-            width: 80px;
-        }
-        .slider-row input {
-            width: 120px;
-        }
-        .slider-row .value {
-            width: 50px;
-            text-align: right;
-            color: #aaa;
-        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.min.js"></script>
 </head>
 <body>
     <canvas id="canvas"></canvas>
     <div id="measurer"></div>
-    <div id="info">Loading...</div>
-    <div id="start-screen">press space to start</div>
-    <div id="controls">
-        <div class="slider-row">
-            <label>scale</label>
-            <input type="range" id="scale" min="50" max="500" step="10" value="130">
-            <span class="value" id="scaleVal">130</span>
-        </div>
-        <div class="slider-row">
-            <label>speed</label>
-            <input type="range" id="speed" min="0.5" max="5" step="0.1" value="2.6">
-            <span class="value" id="speedVal">2.6</span>
-        </div>
-        <div class="slider-row">
-            <label>evolution</label>
-            <input type="range" id="evolution" min="0" max="0.01" step="0.0005" value="0.005">
-            <span class="value" id="evolutionVal">0.0050</span>
-        </div>
-        <div class="slider-row">
-            <label>fade</label>
-            <input type="range" id="fade" min="0.01" max="0.2" step="0.01" value="0.12">
-            <span class="value" id="fadeVal">0.12</span>
-        </div>
-    </div>
 
     <script>
     // === CONFIG ===
@@ -140,7 +64,6 @@ agreement`
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const simplex = new SimplexNoise();
-    const info = document.getElementById('info');
 
     let width, height, centerX, centerY;
     function resize() {
@@ -159,17 +82,6 @@ agreement`
         evolution: 0.005,
         fade: 0.12
     };
-
-    // Wire up sliders
-    ['scale', 'speed', 'evolution', 'fade'].forEach(name => {
-        const slider = document.getElementById(name);
-        const display = document.getElementById(name + 'Val');
-        slider.addEventListener('input', () => {
-            params[name] = parseFloat(slider.value);
-            const decimals = name === 'evolution' ? 4 : name === 'fade' ? 2 : 1;
-            display.textContent = params[name].toFixed(decimals);
-        });
-    });
 
     // === BEAT SYNC ===
     const BPM = 144;
@@ -333,7 +245,6 @@ agreement`
     // === INIT ===
     let particles = [];
     let numLines = 3; // default for 3-line stanzas
-    let waitingToStart = true; // waiting for first space press
 
     async function init() {
         await document.fonts.ready;
@@ -347,11 +258,13 @@ agreement`
         lineTransitions = new Array(numLines).fill(null);
         pendingPixelsByLine = new Array(numLines).fill(null).map(() => []);
 
-        // Clear and start animation loop (but no particles)
+        // Clear and start animation loop
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, width, height);
-        info.style.display = 'none';
         animate();
+
+        // Auto-start: spawn initial text immediately
+        spawnInitialText();
     }
 
     function spawnInitialText() {
@@ -391,8 +304,6 @@ agreement`
             }, i * LINE_DELAY);
         }
 
-        info.style.display = 'block';
-        info.textContent = `${textPixels.length} particles | text 0`;
     }
 
     // Transition animation state - per line
@@ -402,11 +313,11 @@ agreement`
     let pendingPixelsByLine = []; // pending new pixels per line
     let lineAttraction = []; // per-line attraction values
 
-    function startTransition() {
+    function startTransition(targetIndex) {
         if (lineTransitions[0]) return; // Already transitioning
 
-        // Advance text index (loops back to 0 after last)
-        textIndex = (textIndex + 1) % TEXTS.length;
+        // Use target index if provided, otherwise advance cyclically
+        textIndex = targetIndex !== undefined ? targetIndex : (textIndex + 1) % TEXTS.length;
 
         // Schedule each line to start with staggered delay
         for (let i = 0; i < numLines; i++) {
@@ -513,36 +424,21 @@ agreement`
         // Remove dead particles
         particles = particles.filter(p => !p.dying || p.z > 0.01);
 
-        // Update info
-        const anyTransitioning = lineTransitions.some(t => t !== null);
-        if (anyTransitioning) {
-            info.textContent = `${particles.length} particles (transitioning)`;
-        } else {
-            info.textContent = `${particles.length} particles | text ${textIndex}`;
-        }
     }
 
-    // Space to start transition, U to toggle UI
-    window.addEventListener('keydown', (e) => {
-        if (e.code === 'Space') {
-            e.preventDefault();
-            if (waitingToStart) {
-                // First space: hide start screen, wait 2s, then spawn text 0
-                document.getElementById('start-screen').style.display = 'none';
-                waitingToStart = false;
-                setTimeout(() => {
-                    spawnInitialText();
-                }, 2000);
-            } else {
-                startTransition();
+    // === SCROLL-DRIVEN TRANSITIONS ===
+    let currentScrollZone = 0; // 0, 1, or 2 (one per stanza)
+
+    window.addEventListener('scroll', () => {
+        const scrollFraction = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+        const zone = Math.min(Math.floor(scrollFraction * TEXTS.length), TEXTS.length - 1);
+
+        if (zone !== currentScrollZone) {
+            currentScrollZone = zone;
+            // Only trigger transition if we're moving to a different text
+            if (zone !== textIndex) {
+                startTransition(zone);
             }
-        }
-        if (e.code === 'KeyU') {
-            const controls = document.getElementById('controls');
-            const infoEl = document.getElementById('info');
-            const hidden = controls.style.display === 'none';
-            controls.style.display = hidden ? 'block' : 'none';
-            infoEl.style.display = hidden ? 'block' : 'none';
         }
     });
 

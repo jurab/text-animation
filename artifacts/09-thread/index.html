@@ -16,9 +16,7 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     html, body {
-      height: 100%;
-      overflow: hidden;
-      position: fixed;
+      min-height: 500vh;
       width: 100%;
       background: #0a0a0a;
       font-family: 'ADolphin', Georgia, serif;
@@ -47,30 +45,10 @@
       pointer-events: none;
     }
 
-    .debug {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      color: #666;
-      font-family: monospace;
-      font-size: 12px;
-      z-index: 1000;
-    }
-
-    #progress {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      height: 3px;
-      background: #fff;
-      transition: width 0.05s;
-    }
   </style>
 </head>
 <body>
   <div class="text-container" id="container"></div>
-  <div class="debug" id="debug">T: 0 | scroll: 0%</div>
-  <div id="progress"></div>
 
   <script>
     const TEXT = 'old this thread';
@@ -107,10 +85,6 @@
     let scrollProgress = 0;
     window.scrollProgress = 0;
     let frameTime = 0;  // For shake oscillation
-    let pausedAtLanding = false;  // Pause when S lands
-    let shakeTriggered = false;   // Full shake from space tap
-    let autoFalling = false;      // Auto-animate fall on second space
-    let autoFallStart = 0;        // Timestamp when auto-fall began
 
     // Positions for "Svaž si mě" layout
     let sStartX, sStartY;  // Above shadow position
@@ -322,23 +296,16 @@
       animate();
     }
 
-    const AUTO_FALL_DURATION = 1200;  // ms for auto-fall animation
-
     function animate() {
       frameTime = performance.now();
 
-      // Auto-fall animation
-      if (autoFalling) {
-        const elapsed = frameTime - autoFallStart;
-        const t = Math.min(1, elapsed / AUTO_FALL_DURATION);
-        scrollProgress = PHASE.S_FALL_START + (PHASE.S_FALL_END - PHASE.S_FALL_START) * easeInQuad(t);
-        window.scrollProgress = scrollProgress;
-
-        // When done, reset
-        if (t >= 1) {
-          resetToStart();
-        }
+      // Update scroll progress from native scroll position
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      if (maxScroll > 0) {
+        scrollProgress = window.scrollY / maxScroll;
       }
+      scrollProgress = Math.max(0, Math.min(1, scrollProgress));
+      window.scrollProgress = scrollProgress;
 
       const s = scrollProgress;
 
@@ -401,8 +368,7 @@
       let sShakeX = 0, sShakeY = 0, sRotation = 0, sFalling = false;
 
       if (s >= PHASE.S_SHAKE_START && s < PHASE.S_FALL_START) {
-        // Full intensity if triggered by space, otherwise ramp up
-        const intensity = shakeTriggered ? 1 : easeInQuad(Math.min(1, (s - PHASE.S_SHAKE_START) / (PHASE.S_SHAKE_END - PHASE.S_SHAKE_START)));
+        const intensity = easeInQuad(Math.min(1, (s - PHASE.S_SHAKE_START) / (PHASE.S_SHAKE_END - PHASE.S_SHAKE_START)));
 
         sShakeX = Math.sin(frameTime * 0.001 * S_SHAKE.freqX + S_SHAKE.phase) * S_SHAKE.ampX * intensity;
         sShakeY = Math.sin(frameTime * 0.001 * S_SHAKE.freqY + S_SHAKE.phase) * S_SHAKE.ampY * intensity;
@@ -448,17 +414,6 @@
         sLetter.el.style.opacity = sLetter.opacity;
       }
 
-      // Debug
-      const phase = s < PHASE.DRIFT_START ? 'locked' :
-                    s < PHASE.DRIFT_END ? 'drift' :
-                    s < PHASE.S_FADE_END ? 's-fade' :
-                    s < PHASE.S_DROP_END ? 's-drop' :
-                    s < PHASE.S_SHAKE_START ? 'locked-svaz' :
-                    s < PHASE.S_FALL_START ? 's-shake' : 's-fall';
-      document.getElementById('debug').textContent =
-        `T: ${temperature.toFixed(3)} | scroll: ${(s * 100).toFixed(1)}% | ${phase}`;
-      document.getElementById('progress').style.width = `${s * 100}%`;
-
       requestAnimationFrame(animate);
     }
 
@@ -474,76 +429,6 @@
     function easeInQuad(t) {
       return t * t;
     }
-
-    function resetToStart() {
-      scrollProgress = 0;
-      window.scrollProgress = 0;
-      pausedAtLanding = false;
-      shakeTriggered = false;
-      autoFalling = false;
-
-      // Reset S to shadow position
-      sLetter.x = sStartX;
-      sLetter.y = sStartY;
-      sLetter.vx = 0;
-      sLetter.vy = 0;
-      sLetter.opacity = 0;
-      sLetter.joinedPhysics = false;
-
-      // Reset letters to original "važ si mě" positions
-      letters.forEach(l => {
-        l.targetX = l.originalTargetX;
-        l.x = l.originalTargetX;
-        l.y = l.targetY;
-        l.vx = 0;
-        l.vy = 0;
-      });
-    }
-
-    window.addEventListener('wheel', (e) => {
-      e.preventDefault();
-
-      // If paused at landing, ignore scroll
-      if (pausedAtLanding) return;
-
-      const prevProgress = scrollProgress;
-      scrollProgress += e.deltaY * 0.0005;
-
-      // Pause when S lands (crossing S_DROP_END threshold)
-      if (prevProgress < PHASE.S_DROP_END && scrollProgress >= PHASE.S_DROP_END) {
-        scrollProgress = PHASE.S_DROP_END;
-        pausedAtLanding = true;
-      }
-
-      // Loop: reset when reaching the end
-      if (scrollProgress >= 1) {
-        resetToStart();
-      }
-      scrollProgress = Math.max(0, Math.min(1, scrollProgress));
-      window.scrollProgress = scrollProgress;
-    }, { passive: false });
-
-    // Space to unpause - jump straight to shake at full intensity
-    // Second space triggers auto-fall
-    window.addEventListener('keydown', (e) => {
-      if (e.code === 'Space') {
-        e.preventDefault();
-
-        if (pausedAtLanding) {
-          // First space: unpause and start shake
-          pausedAtLanding = false;
-          shakeTriggered = true;
-          scrollProgress = PHASE.S_SHAKE_START;
-          window.scrollProgress = scrollProgress;
-        } else if (shakeTriggered && !autoFalling && scrollProgress >= PHASE.S_SHAKE_START && scrollProgress < PHASE.S_FALL_END) {
-          // Second space during shake: trigger auto-fall
-          autoFalling = true;
-          autoFallStart = performance.now();
-          scrollProgress = PHASE.S_FALL_START;
-          window.scrollProgress = scrollProgress;
-        }
-      }
-    });
 
     document.fonts.ready.then(() => {
       init();
