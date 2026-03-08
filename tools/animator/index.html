@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="scrap-title" content="Combinations">
+  <title>Combinations - Transform Stacker</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0a;
+      color: #888;
+      font-family: system-ui;
+      font-size: 12px;
+      display: flex;
+      height: 100vh;
+    }
+
+    #controls {
+      width: 280px;
+      padding: 15px;
+      background: #111;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    #controls h3 {
+      color: #ccc;
+      margin: 15px 0 10px 0;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #333;
+    }
+
+    #controls h3:first-child { margin-top: 0; }
+
+    .slider-row {
+      margin-bottom: 8px;
+    }
+
+    .slider-row label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2px;
+    }
+
+    .slider-row label span {
+      font-family: monospace;
+      color: #f80;
+    }
+
+    .slider-row input[type="range"] {
+      width: 100%;
+    }
+
+    .text-input {
+      margin-bottom: 12px;
+    }
+
+    .text-input input {
+      width: 100%;
+      padding: 6px 8px;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      color: #ccc;
+      font-size: 14px;
+    }
+
+    .checkbox-row {
+      margin-bottom: 6px;
+    }
+
+    .checkbox-row label {
+      cursor: pointer;
+    }
+
+    #canvasArea {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #0a0a0a;
+    }
+
+    canvas {
+      background: #000;
+    }
+
+    .transform-type {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .transform-type button {
+      padding: 4px 8px;
+      background: #222;
+      border: 1px solid #444;
+      color: #888;
+      cursor: pointer;
+      font-size: 11px;
+    }
+
+    .transform-type button.active {
+      background: #444;
+      color: #fff;
+      border-color: #666;
+    }
+
+    .transform-type button:hover {
+      background: #333;
+    }
+
+    #info {
+      position: fixed;
+      bottom: 160px;
+      right: 10px;
+      color: #666;
+      font-family: monospace;
+      font-size: 11px;
+    }
+
+    .status {
+      color: #4a4;
+      font-size: 11px;
+      margin-top: 5px;
+    }
+
+    #curveContainer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 150px;
+      background: #111;
+      border-top: 1px solid #333;
+      transition: height 0.2s;
+    }
+
+    #curveContainer.collapsed {
+      height: 24px;
+    }
+
+    #curveContainer.collapsed #curveHandle h3,
+    #curveContainer.collapsed #curveHandle .grip,
+    #curveContainer.collapsed #curvePresets {
+      display: none;
+    }
+
+    #curveHandle {
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 15px;
+      cursor: ns-resize;
+      user-select: none;
+    }
+
+    #curveHandle h3 {
+      color: #ccc;
+      font-size: 12px;
+      margin: 0;
+    }
+
+    #curvePresets {
+      display: flex;
+      gap: 5px;
+      flex: 1;
+      justify-content: center;
+    }
+
+    #curvePresets button {
+      padding: 2px 8px;
+      background: #222;
+      border: 1px solid #444;
+      color: #888;
+      cursor: pointer;
+      font-size: 10px;
+    }
+
+    #curvePresets button:hover {
+      background: #333;
+      color: #fff;
+    }
+
+    #curveHandle .grip {
+      color: #555;
+      font-size: 10px;
+      letter-spacing: 2px;
+    }
+
+    #curveToggle {
+      background: none;
+      border: none;
+      color: #888;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 4px 8px;
+    }
+
+    #curveToggle:hover {
+      color: #fff;
+    }
+
+    #curveEditorWrap {
+      padding: 0 15px 10px 15px;
+      height: calc(100% - 30px);
+    }
+
+    #curveContainer.collapsed #curveEditorWrap {
+      display: none;
+    }
+
+    #curveEditor {
+      width: 100%;
+      height: 100%;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      cursor: crosshair;
+    }
+
+    #canvasArea {
+      padding-bottom: 150px;
+      transition: padding-bottom 0.2s;
+    }
+
+    /* Scroll mode: prevent actual page scroll */
+    html.scroll-mode,
+    body.scroll-mode {
+      overflow: hidden;
+      overscroll-behavior: none;
+      position: fixed;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="controls">
+    <h3>Text</h3>
+    <div class="text-input">
+      <input type="text" id="textInput" value="Ahoj" placeholder="Enter text...">
+    </div>
+    <div class="slider-row">
+      <label>Font size <span id="fontSizeVal">120</span></label>
+      <input type="range" id="fontSize" min="20" max="300" value="120">
+    </div>
+    <div class="status" id="pixelStatus"></div>
+
+    <h3>Transform</h3>
+    <div class="transform-type" id="transformBtns">
+      <button data-transform="none" class="active">None</button>
+      <button data-transform="skewX">Skew X</button>
+      <button data-transform="skewY">Skew Y</button>
+      <button data-transform="stretch">Stretch</button>
+      <button data-transform="rotate">Rotate</button>
+      <button data-transform="twist">Twist</button>
+      <button data-transform="bend">Bend</button>
+      <button data-transform="wave">Wave</button>
+      <button data-transform="taper">Taper</button>
+      <button data-transform="bulge">Bulge</button>
+      <button data-transform="flag">Flag</button>
+    </div>
+
+    <div class="slider-row">
+      <label>Amount <span id="amountVal">0.00</span></label>
+      <input type="range" id="amount" min="-100" max="100" value="0">
+    </div>
+
+    <div class="slider-row">
+      <label>Secondary <span id="secondaryVal">0.00</span></label>
+      <input type="range" id="secondary" min="-100" max="100" value="0">
+    </div>
+
+    <div class="slider-row">
+      <label>Speed <span id="speedVal">1.0</span></label>
+      <input type="range" id="speed" min="1" max="50" value="10">
+    </div>
+
+    <div class="checkbox-row">
+      <label><input type="checkbox" id="animate"> Animate (or press Space)</label>
+    </div>
+    <div class="checkbox-row">
+      <label><input type="checkbox" id="scrollBind"> Bind to scroll</label>
+    </div>
+
+    <h3>Render Mode</h3>
+    <div class="checkbox-row">
+      <label><input type="checkbox" id="pixelMode" checked> Pixel mode</label>
+    </div>
+    <div class="slider-row">
+      <label>Resolution <span id="resolutionVal">1.0x</span></label>
+      <input type="range" id="resolution" min="1" max="2" step="0.1" value="1">
+    </div>
+    <div class="slider-row">
+      <label>Skip <span id="skipVal">1</span></label>
+      <input type="range" id="skip" min="1" max="4" value="1">
+    </div>
+    <div class="slider-row">
+      <label>Pixel size <span id="pixelSizeVal">1</span></label>
+      <input type="range" id="pixelSize" min="1" max="5" value="1">
+    </div>
+    <div class="slider-row">
+      <label>Followers <span id="followersVal">1</span></label>
+      <input type="range" id="followers" min="1" max="5" value="1">
+    </div>
+    <div class="slider-row">
+      <label>Spread <span id="spreadVal">0</span></label>
+      <input type="range" id="spread" min="0" max="20" value="0">
+    </div>
+    <div class="slider-row">
+      <label>Scatter <span id="scatterVal">0</span></label>
+      <input type="range" id="scatter" min="0" max="50" value="0">
+    </div>
+    <div class="slider-row">
+      <label>Repulsion <span id="repulsionVal">0</span></label>
+      <input type="range" id="repulsion" min="0" max="100" value="0">
+    </div>
+
+    <h3>Display</h3>
+    <div class="checkbox-row">
+      <label><input type="checkbox" id="showGlyph"> Show original glyph (gray)</label>
+    </div>
+  </div>
+
+  <div id="canvasArea">
+    <canvas id="canvas" width="800" height="600"></canvas>
+  </div>
+
+  <div id="info">Loading font...</div>
+
+  <div id="curveContainer">
+    <div id="curveHandle">
+      <h3>Curve</h3>
+      <div id="curvePresets">
+        <button data-preset="sine">Sine</button>
+        <button data-preset="linear">Linear</button>
+        <button data-preset="bounce">Bounce</button>
+        <button data-preset="elastic">Elastic</button>
+        <button data-preset="steps">Steps</button>
+      </div>
+      <span class="grip">⋮⋮</span>
+      <button id="curveToggle">▼</button>
+    </div>
+    <div id="curveEditorWrap">
+      <canvas id="curveEditor"></canvas>
+    </div>
+  </div>
+
+  <script type="module">
+    import opentype from 'https://esm.sh/opentype.js@1.3.4';
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const info = document.getElementById('info');
+
+    let font = null;
+    let currentTransform = 'none';
+    let animationPhase = 0;
+    let animating = false;
+    let scrollBound = false;
+    window.scrollProgress = 0;
+
+    // ============ LEADER/FOLLOWER DATA ============
+    // Leaders: extracted from original glyph, transformed each frame (invisible)
+    // Followers: visible pixels, each bound to a leader with offset
+    let leaders = [];      // { home: {x,y}, pos: {x,y} }
+    let followers = [];    // { leaderIdx, offsetX, offsetY }
+    let glyphBounds = null; // bounds of original glyph (for transforms)
+    let glyphPath = null;   // original path (for drawing ghost)
+    let canvasOffset = { x: 0, y: 0 }; // centering offset
+
+    // ============ CURVE EDITOR ============
+    const curveCanvas = document.getElementById('curveEditor');
+    const curveCtx = curveCanvas.getContext('2d');
+
+    // Curve keyframes: x=time(0-1), y=amount(-1 to 1), h1/h2=bezier handles (relative)
+    let curvePoints = [
+      { x: 0, y: 0, h1: { x: -0.1, y: 0 }, h2: { x: 0.15, y: 0.5 } },
+      { x: 0.5, y: 1, h1: { x: -0.15, y: 0 }, h2: { x: 0.15, y: 0 } },
+      { x: 1, y: 0, h1: { x: -0.15, y: 0.5 }, h2: { x: 0.1, y: 0 } }
+    ];
+
+    let curveDrag = null; // { type: 'point'|'h1'|'h2', idx: number }
+    let curveHover = null;
+    const CURVE_PADDING = 10;
+
+    function initCurveCanvas() {
+      const rect = curveCanvas.getBoundingClientRect();
+      curveCanvas.width = rect.width;
+      curveCanvas.height = rect.height;
+    }
+
+    function curveToCanvas(x, y) {
+      const w = curveCanvas.width - CURVE_PADDING * 2;
+      const h = curveCanvas.height - CURVE_PADDING * 2;
+      return {
+        x: CURVE_PADDING + x * w,
+        y: CURVE_PADDING + (1 - (y + 1) / 2) * h  // y: -1 to 1 → bottom to top
+      };
+    }
+
+    function canvasToCurve(cx, cy) {
+      const w = curveCanvas.width - CURVE_PADDING * 2;
+      const h = curveCanvas.height - CURVE_PADDING * 2;
+      return {
+        x: (cx - CURVE_PADDING) / w,
+        y: ((1 - (cy - CURVE_PADDING) / h) * 2) - 1
+      };
+    }
+
+    function drawCurve() {
+      const w = curveCanvas.width;
+      const h = curveCanvas.height;
+
+      curveCtx.clearRect(0, 0, w, h);
+
+      // Grid lines
+      curveCtx.strokeStyle = '#333';
+      curveCtx.lineWidth = 1;
+      const zero = curveToCanvas(0, 0);
+      curveCtx.beginPath();
+      curveCtx.moveTo(CURVE_PADDING, zero.y);
+      curveCtx.lineTo(w - CURVE_PADDING, zero.y);
+      curveCtx.stroke();
+
+      // Draw bezier curve
+      curveCtx.strokeStyle = '#f80';
+      curveCtx.lineWidth = 2;
+      curveCtx.beginPath();
+
+      const p0 = curveToCanvas(curvePoints[0].x, curvePoints[0].y);
+      curveCtx.moveTo(p0.x, p0.y);
+
+      for (let i = 0; i < curvePoints.length - 1; i++) {
+        const cp = curvePoints[i];
+        const np = curvePoints[i + 1];
+
+        const p1 = curveToCanvas(cp.x + cp.h2.x, cp.y + cp.h2.y);
+        const p2 = curveToCanvas(np.x + np.h1.x, np.y + np.h1.y);
+        const p3 = curveToCanvas(np.x, np.y);
+
+        curveCtx.bezierCurveTo(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+      }
+      curveCtx.stroke();
+
+      // Draw handles and points
+      for (let i = 0; i < curvePoints.length; i++) {
+        const pt = curvePoints[i];
+        const pos = curveToCanvas(pt.x, pt.y);
+        const h1 = curveToCanvas(pt.x + pt.h1.x, pt.y + pt.h1.y);
+        const h2 = curveToCanvas(pt.x + pt.h2.x, pt.y + pt.h2.y);
+
+        // Handle lines
+        curveCtx.strokeStyle = '#666';
+        curveCtx.lineWidth = 1;
+        curveCtx.beginPath();
+        curveCtx.moveTo(h1.x, h1.y);
+        curveCtx.lineTo(pos.x, pos.y);
+        curveCtx.lineTo(h2.x, h2.y);
+        curveCtx.stroke();
+
+        // Handle circles
+        curveCtx.fillStyle = curveHover?.type === 'h1' && curveHover?.idx === i ? '#fff' : '#888';
+        curveCtx.beginPath();
+        curveCtx.arc(h1.x, h1.y, 4, 0, Math.PI * 2);
+        curveCtx.fill();
+
+        curveCtx.fillStyle = curveHover?.type === 'h2' && curveHover?.idx === i ? '#fff' : '#888';
+        curveCtx.beginPath();
+        curveCtx.arc(h2.x, h2.y, 4, 0, Math.PI * 2);
+        curveCtx.fill();
+
+        // Keyframe point
+        curveCtx.fillStyle = curveHover?.type === 'point' && curveHover?.idx === i ? '#fff' : '#f80';
+        curveCtx.beginPath();
+        curveCtx.arc(pos.x, pos.y, 6, 0, Math.PI * 2);
+        curveCtx.fill();
+      }
+
+      // Draw playhead if animating or scroll bound
+      if (animating || scrollBound) {
+        const t = (animationPhase % (Math.PI * 2)) / (Math.PI * 2);
+        const playhead = curveToCanvas(t, 0);
+        curveCtx.strokeStyle = scrollBound ? '#48f' : '#4f4';
+        curveCtx.lineWidth = 1;
+        curveCtx.beginPath();
+        curveCtx.moveTo(playhead.x, CURVE_PADDING);
+        curveCtx.lineTo(playhead.x, h - CURVE_PADDING);
+        curveCtx.stroke();
+      }
+    }
+
+    function hitTestCurve(cx, cy) {
+      const threshold = 10;
+      for (let i = 0; i < curvePoints.length; i++) {
+        const pt = curvePoints[i];
+        const pos = curveToCanvas(pt.x, pt.y);
+        const h1 = curveToCanvas(pt.x + pt.h1.x, pt.y + pt.h1.y);
+        const h2 = curveToCanvas(pt.x + pt.h2.x, pt.y + pt.h2.y);
+
+        // Check handles first (smaller targets)
+        if (Math.hypot(cx - h1.x, cy - h1.y) < threshold) return { type: 'h1', idx: i };
+        if (Math.hypot(cx - h2.x, cy - h2.y) < threshold) return { type: 'h2', idx: i };
+        if (Math.hypot(cx - pos.x, cy - pos.y) < threshold) return { type: 'point', idx: i };
+      }
+      return null;
+    }
+
+    // Cubic bezier sampling
+    function sampleCubicBezier(p0, p1, p2, p3, t) {
+      const mt = 1 - t;
+      return mt*mt*mt*p0 + 3*mt*mt*t*p1 + 3*mt*t*t*p2 + t*t*t*p3;
+    }
+
+    function sampleCurve(t) {
+      t = Math.max(0, Math.min(1, t));
+
+      // Find segment
+      let segIdx = 0;
+      for (let i = 0; i < curvePoints.length - 1; i++) {
+        if (t >= curvePoints[i].x && t <= curvePoints[i + 1].x) {
+          segIdx = i;
+          break;
+        }
+      }
+
+      const cp = curvePoints[segIdx];
+      const np = curvePoints[segIdx + 1];
+
+      // Local t within segment
+      const localT = (t - cp.x) / (np.x - cp.x);
+
+      // Sample y using bezier
+      const y0 = cp.y;
+      const y1 = cp.y + cp.h2.y;
+      const y2 = np.y + np.h1.y;
+      const y3 = np.y;
+
+      return sampleCubicBezier(y0, y1, y2, y3, localT);
+    }
+
+    // Curve interaction
+    curveCanvas.addEventListener('mousedown', (e) => {
+      const rect = curveCanvas.getBoundingClientRect();
+      const cx = e.clientX - rect.left;
+      const cy = e.clientY - rect.top;
+
+      const hit = hitTestCurve(cx, cy);
+      if (hit) {
+        curveDrag = hit;
+      } else {
+        // Add new point
+        const curve = canvasToCurve(cx, cy);
+        if (curve.x > 0 && curve.x < 1) {
+          // Find insert position
+          let insertIdx = curvePoints.length - 1;
+          for (let i = 0; i < curvePoints.length - 1; i++) {
+            if (curve.x > curvePoints[i].x && curve.x < curvePoints[i + 1].x) {
+              insertIdx = i + 1;
+              break;
+            }
+          }
+          curvePoints.splice(insertIdx, 0, {
+            x: curve.x,
+            y: Math.max(-1, Math.min(1, curve.y)),
+            h1: { x: -0.1, y: 0 },
+            h2: { x: 0.1, y: 0 }
+          });
+          curveDrag = { type: 'point', idx: insertIdx };
+          drawCurve();
+        }
+      }
+    });
+
+    curveCanvas.addEventListener('mousemove', (e) => {
+      const rect = curveCanvas.getBoundingClientRect();
+      const cx = e.clientX - rect.left;
+      const cy = e.clientY - rect.top;
+
+      if (curveDrag) {
+        const curve = canvasToCurve(cx, cy);
+        const pt = curvePoints[curveDrag.idx];
+
+        const firstPt = curvePoints[0];
+        const lastPt = curvePoints[curvePoints.length - 1];
+        const isFirst = curveDrag.idx === 0;
+        const isLast = curveDrag.idx === curvePoints.length - 1;
+
+        if (curveDrag.type === 'point') {
+          // Constrain x to neighbors (first/last fixed at 0/1)
+          const minX = curveDrag.idx === 0 ? 0 : curvePoints[curveDrag.idx - 1].x + 0.01;
+          const maxX = curveDrag.idx === curvePoints.length - 1 ? 1 : curvePoints[curveDrag.idx + 1].x - 0.01;
+          pt.x = Math.max(minX, Math.min(maxX, curve.x));
+          pt.y = Math.max(-1, Math.min(1, curve.y));
+          // Link first/last Y values for seamless loop
+          if (isFirst) lastPt.y = pt.y;
+          if (isLast) firstPt.y = pt.y;
+        } else if (curveDrag.type === 'h1') {
+          pt.h1.x = curve.x - pt.x;
+          pt.h1.y = curve.y - pt.y;
+          // Mirror: last h1 ↔ first h1 (both incoming handles)
+          if (isLast) {
+            firstPt.h1.x = -pt.h1.x;
+            firstPt.h1.y = pt.h1.y;
+          }
+          if (isFirst) {
+            lastPt.h1.x = -pt.h1.x;
+            lastPt.h1.y = pt.h1.y;
+          }
+        } else if (curveDrag.type === 'h2') {
+          pt.h2.x = curve.x - pt.x;
+          pt.h2.y = curve.y - pt.y;
+          // Mirror: first h2 ↔ last h2 (both outgoing handles)
+          if (isFirst) {
+            lastPt.h2.x = -pt.h2.x;
+            lastPt.h2.y = pt.h2.y;
+          }
+          if (isLast) {
+            firstPt.h2.x = -pt.h2.x;
+            firstPt.h2.y = pt.h2.y;
+          }
+        }
+        drawCurve();
+        if (!animating) render();
+      } else {
+        const hit = hitTestCurve(cx, cy);
+        if (hit !== curveHover) {
+          curveHover = hit;
+          drawCurve();
+        }
+      }
+    });
+
+    curveCanvas.addEventListener('mouseup', () => {
+      curveDrag = null;
+    });
+
+    curveCanvas.addEventListener('mouseleave', () => {
+      curveDrag = null;
+      curveHover = null;
+      drawCurve();
+    });
+
+    curveCanvas.addEventListener('dblclick', (e) => {
+      const rect = curveCanvas.getBoundingClientRect();
+      const cx = e.clientX - rect.left;
+      const cy = e.clientY - rect.top;
+
+      const hit = hitTestCurve(cx, cy);
+      if (hit?.type === 'point' && hit.idx > 0 && hit.idx < curvePoints.length - 1) {
+        curvePoints.splice(hit.idx, 1);
+        drawCurve();
+        if (!animating) render();
+      }
+    });
+
+    // Curve container resize & toggle
+    const curveContainer = document.getElementById('curveContainer');
+    const curveHandle = document.getElementById('curveHandle');
+    const curveToggle = document.getElementById('curveToggle');
+    const canvasArea = document.getElementById('canvasArea');
+    let curveResizing = false;
+    let curveHeight = 150;
+
+    curveHandle.addEventListener('mousedown', (e) => {
+      if (e.target === curveToggle) return;
+      if (curveContainer.classList.contains('collapsed')) return;
+      curveResizing = true;
+      curveContainer.style.transition = 'none';
+      canvasArea.style.transition = 'none';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!curveResizing) return;
+      const newHeight = window.innerHeight - e.clientY;
+      curveHeight = Math.max(100, Math.min(500, newHeight));
+      curveContainer.style.height = curveHeight + 'px';
+      canvasArea.style.paddingBottom = curveHeight + 'px';
+      initCurveCanvas();
+      drawCurve();
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (curveResizing) {
+        curveResizing = false;
+        curveContainer.style.transition = '';
+        canvasArea.style.transition = '';
+      }
+    });
+
+    curveToggle.addEventListener('click', () => {
+      const collapsed = curveContainer.classList.toggle('collapsed');
+      curveToggle.textContent = collapsed ? '▲' : '▼';
+      canvasArea.style.paddingBottom = collapsed ? '24px' : curveHeight + 'px';
+      if (!collapsed) {
+        setTimeout(() => {
+          initCurveCanvas();
+          drawCurve();
+        }, 200);
+      }
+    });
+
+    // Curve presets
+    const curvePresets = {
+      sine: [
+        { x: 0, y: 0, h1: { x: -0.08, y: -0.55 }, h2: { x: 0.08, y: 0.55 } },
+        { x: 0.25, y: 1, h1: { x: -0.13, y: 0 }, h2: { x: 0.13, y: 0 } },
+        { x: 0.5, y: 0, h1: { x: -0.08, y: 0.55 }, h2: { x: 0.08, y: -0.55 } },
+        { x: 0.75, y: -1, h1: { x: -0.13, y: 0 }, h2: { x: 0.13, y: 0 } },
+        { x: 1, y: 0, h1: { x: -0.08, y: -0.55 }, h2: { x: 0.08, y: 0.55 } }
+      ],
+      linear: [
+        { x: 0, y: -1, h1: { x: -0.1, y: 0 }, h2: { x: 0.1, y: 0.2 } },
+        { x: 0.5, y: 0, h1: { x: -0.1, y: -0.2 }, h2: { x: 0.1, y: 0.2 } },
+        { x: 1, y: 1, h1: { x: -0.1, y: -0.2 }, h2: { x: 0.1, y: 0 } }
+      ],
+      bounce: [
+        { x: 0, y: 0, h1: { x: -0.05, y: 0 }, h2: { x: 0.1, y: 0.8 } },
+        { x: 0.35, y: 1, h1: { x: -0.1, y: 0 }, h2: { x: 0.05, y: 0 } },
+        { x: 0.5, y: 0.7, h1: { x: -0.03, y: 0 }, h2: { x: 0.03, y: 0 } },
+        { x: 0.65, y: 1, h1: { x: -0.05, y: 0 }, h2: { x: 0.1, y: 0 } },
+        { x: 1, y: 0, h1: { x: -0.1, y: 0.8 }, h2: { x: 0.05, y: 0 } }
+      ],
+      elastic: [
+        { x: 0, y: 0, h1: { x: -0.05, y: 0 }, h2: { x: 0.08, y: 0.6 } },
+        { x: 0.25, y: 1.2, h1: { x: -0.05, y: 0 }, h2: { x: 0.05, y: 0 } },
+        { x: 0.4, y: 0.85, h1: { x: -0.04, y: 0 }, h2: { x: 0.04, y: 0 } },
+        { x: 0.55, y: 1.05, h1: { x: -0.04, y: 0 }, h2: { x: 0.04, y: 0 } },
+        { x: 0.7, y: 0.95, h1: { x: -0.04, y: 0 }, h2: { x: 0.08, y: 0 } },
+        { x: 1, y: 0, h1: { x: -0.1, y: 0.4 }, h2: { x: 0.05, y: 0 } }
+      ],
+      steps: [
+        { x: 0, y: -1, h1: { x: -0.05, y: 0 }, h2: { x: 0.05, y: 0 } },
+        { x: 0.2, y: -1, h1: { x: -0.05, y: 0 }, h2: { x: 0.01, y: 0 } },
+        { x: 0.21, y: 0, h1: { x: -0.01, y: 0 }, h2: { x: 0.05, y: 0 } },
+        { x: 0.5, y: 0, h1: { x: -0.05, y: 0 }, h2: { x: 0.01, y: 0 } },
+        { x: 0.51, y: 1, h1: { x: -0.01, y: 0 }, h2: { x: 0.05, y: 0 } },
+        { x: 0.8, y: 1, h1: { x: -0.05, y: 0 }, h2: { x: 0.01, y: 0 } },
+        { x: 0.81, y: 0, h1: { x: -0.01, y: 0 }, h2: { x: 0.05, y: 0 } },
+        { x: 1, y: 0, h1: { x: -0.05, y: 0 }, h2: { x: 0.05, y: 0 } }
+      ]
+    };
+
+    document.querySelectorAll('#curvePresets button').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const preset = btn.dataset.preset;
+        if (curvePresets[preset]) {
+          curvePoints = JSON.parse(JSON.stringify(curvePresets[preset]));
+          drawCurve();
+          if (!animating) render();
+        }
+      });
+    });
+
+    // ============ SPATIAL HASH (Optimized) ============
+    // Uses integer keys and avoids allocations in hot path
+
+    class SpatialHash {
+      constructor(cellSize = 10) {
+        this.cellSize = cellSize;
+        this.invCellSize = 1 / cellSize;
+        this.grid = new Map();
+        this.neighborResult = []; // Reusable array
+      }
+
+      clear() {
+        this.grid.clear();
+      }
+
+      // Use integer key instead of string for faster hashing
+      _key(x, y) {
+        const cx = (x * this.invCellSize) | 0;
+        const cy = (y * this.invCellSize) | 0;
+        return (cx * 73856093) ^ (cy * 19349663); // Spatial hash function
+      }
+
+      insert(idx, x, y) {
+        const key = this._key(x, y);
+        let cell = this.grid.get(key);
+        if (!cell) {
+          cell = [];
+          this.grid.set(key, cell);
+        }
+        cell.push(idx);
+      }
+
+      // Returns indices directly into reusable array, returns count
+      getNeighborIndices(x, y, outArray) {
+        let count = 0;
+        const cx = (x * this.invCellSize) | 0;
+        const cy = (y * this.invCellSize) | 0;
+
+        // Check 3x3 grid of cells
+        for (let dx = -1; dx <= 1; dx++) {
+          for (let dy = -1; dy <= 1; dy++) {
+            const key = ((cx + dx) * 73856093) ^ ((cy + dy) * 19349663);
+            const cell = this.grid.get(key);
+            if (cell) {
+              for (let k = 0; k < cell.length; k++) {
+                outArray[count++] = cell[k];
+              }
+            }
+          }
+        }
+        return count;
+      }
+    }
+
+    const spatialHash = new SpatialHash(8);
+    const neighborBuffer = new Int32Array(5000); // Pre-allocated buffer for neighbors
+
+    // FPS tracking
+    let lastFrameTime = performance.now();
+    let frameCount = 0;
+    let fps = 0;
+
+    // ============ MATRIX TRANSFORMS ============
+
+    function matrixMultiply(m, x, y) {
+      return {
+        x: m[0] * x + m[1] * y + m[2],
+        y: m[3] * x + m[4] * y + m[5]
+      };
+    }
+
+    function compose(a, b) {
+      return [
+        a[0]*b[0] + a[1]*b[3], a[0]*b[1] + a[1]*b[4], a[0]*b[2] + a[1]*b[5] + a[2],
+        a[3]*b[0] + a[4]*b[3], a[3]*b[1] + a[4]*b[4], a[3]*b[2] + a[4]*b[5] + a[5],
+        0, 0, 1
+      ];
+    }
+
+    function translateMatrix(tx, ty) {
+      return [1, 0, tx, 0, 1, ty, 0, 0, 1];
+    }
+
+    function scaleMatrix(sx, sy) {
+      return [sx, 0, 0, 0, sy, 0, 0, 0, 1];
+    }
+
+    function rotateMatrix(angle) {
+      const c = Math.cos(angle), s = Math.sin(angle);
+      return [c, -s, 0, s, c, 0, 0, 0, 1];
+    }
+
+    function skewXMatrix(angle) {
+      return [1, Math.tan(angle), 0, 0, 1, 0, 0, 0, 1];
+    }
+
+    function skewYMatrix(angle) {
+      return [1, 0, 0, Math.tan(angle), 1, 0, 0, 0, 1];
+    }
+
+    // ============ PER-POINT TRANSFORMS ============
+    // These work on individual pixel positions
+
+    function buildTransformFunction(type, amount, secondary, bounds) {
+      const cx = (bounds.x1 + bounds.x2) / 2;
+      const cy = (bounds.y1 + bounds.y2) / 2;
+
+      if (type === 'none') {
+        return (x, y) => ({ x, y });
+      }
+
+      if (type === 'skewX') {
+        const m = compose(
+          translateMatrix(cx, cy),
+          compose(skewXMatrix(amount), translateMatrix(-cx, -cy))
+        );
+        return (x, y) => matrixMultiply(m, x, y);
+      }
+
+      if (type === 'skewY') {
+        const m = compose(
+          translateMatrix(cx, cy),
+          compose(skewYMatrix(amount), translateMatrix(-cx, -cy))
+        );
+        return (x, y) => matrixMultiply(m, x, y);
+      }
+
+      if (type === 'stretch') {
+        const sx = 1 + amount;
+        const sy = 1 + secondary;
+        const m = compose(
+          translateMatrix(cx, cy),
+          compose(scaleMatrix(sx, sy), translateMatrix(-cx, -cy))
+        );
+        return (x, y) => matrixMultiply(m, x, y);
+      }
+
+      if (type === 'rotate') {
+        const m = compose(
+          translateMatrix(cx, cy),
+          compose(rotateMatrix(amount), translateMatrix(-cx, -cy))
+        );
+        return (x, y) => matrixMultiply(m, x, y);
+      }
+
+      if (type === 'twist') {
+        return (x, y) => {
+          const normalizedY = (y - bounds.y1) / (bounds.y2 - bounds.y1);
+          const angle = amount * normalizedY;
+          const dx = x - cx, dy = y - cy;
+          return {
+            x: cx + dx * Math.cos(angle) - dy * Math.sin(angle),
+            y: cy + dx * Math.sin(angle) + dy * Math.cos(angle)
+          };
+        };
+      }
+
+      if (type === 'bend') {
+        return (x, y) => {
+          const normalizedY = (y - cy) / ((bounds.y2 - bounds.y1) / 2);
+          const displacement = amount * (1 - normalizedY * normalizedY);
+          return { x: x + displacement, y };
+        };
+      }
+
+      if (type === 'wave') {
+        return (x, y) => {
+          const normalizedX = (x - bounds.x1) / (bounds.x2 - bounds.x1);
+          const frequency = 0.5 + Math.abs(secondary) * 1;
+          const displacement = amount * Math.sin(normalizedX * Math.PI * 2 * frequency);
+          return { x, y: y + displacement };
+        };
+      }
+
+      if (type === 'taper') {
+        return (x, y) => {
+          const normalizedY = (y - bounds.y1) / (bounds.y2 - bounds.y1);
+          const scale = 1 + amount * normalizedY;
+          return { x: cx + (x - cx) * scale, y };
+        };
+      }
+
+      if (type === 'bulge') {
+        return (x, y) => {
+          const dx = x - cx, dy = y - cy;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const maxDist = Math.sqrt(Math.pow((bounds.x2-bounds.x1)/2, 2) + Math.pow((bounds.y2-bounds.y1)/2, 2));
+          const normalizedDist = dist / maxDist;
+          const scale = 1 + amount * (1 - normalizedDist * normalizedDist);
+          return { x: cx + dx * scale, y: cy + dy * scale };
+        };
+      }
+
+      if (type === 'flag') {
+        return (x, y) => {
+          const normalizedX = (x - bounds.x1) / (bounds.x2 - bounds.x1);
+          const frequency = 0.5 + Math.abs(secondary) * 1;
+          const amplitude = amount * normalizedX;
+          const displacement = amplitude * Math.sin(normalizedX * Math.PI * 2 * frequency);
+          return { x, y: y + displacement };
+        };
+      }
+
+      return (x, y) => ({ x, y });
+    }
+
+    // ============ PATH FLATTENING (for vector mode) ============
+
+    function sampleQuadratic(x0, y0, x1, y1, x2, y2, segments = 16) {
+      const points = [];
+      for (let i = 1; i <= segments; i++) {
+        const t = i / segments;
+        const mt = 1 - t;
+        points.push({
+          x: mt * mt * x0 + 2 * mt * t * x1 + t * t * x2,
+          y: mt * mt * y0 + 2 * mt * t * y1 + t * t * y2
+        });
+      }
+      return points;
+    }
+
+    function sampleCubic(x0, y0, x1, y1, x2, y2, x3, y3, segments = 24) {
+      const points = [];
+      for (let i = 1; i <= segments; i++) {
+        const t = i / segments;
+        const mt = 1 - t;
+        points.push({
+          x: mt*mt*mt*x0 + 3*mt*mt*t*x1 + 3*mt*t*t*x2 + t*t*t*x3,
+          y: mt*mt*mt*y0 + 3*mt*mt*t*y1 + 3*mt*t*t*y2 + t*t*t*y3
+        });
+      }
+      return points;
+    }
+
+    function flattenPath(commands, highRes = false) {
+      const flat = [];
+      let x = 0, y = 0;
+      let startX = 0, startY = 0;
+
+      const qSegs = highRes ? 32 : 16;
+      const cSegs = highRes ? 48 : 24;
+      const maxLineLen = highRes ? 3 : 8;
+
+      for (const cmd of commands) {
+        switch (cmd.type) {
+          case 'M':
+            flat.push({ type: 'M', x: cmd.x, y: cmd.y });
+            x = startX = cmd.x;
+            y = startY = cmd.y;
+            break;
+          case 'L': {
+            const dx = cmd.x - x;
+            const dy = cmd.y - y;
+            const len = Math.sqrt(dx*dx + dy*dy);
+            const segs = Math.max(1, Math.ceil(len / maxLineLen));
+            for (let i = 1; i <= segs; i++) {
+              const t = i / segs;
+              flat.push({ type: 'L', x: x + dx*t, y: y + dy*t });
+            }
+            x = cmd.x;
+            y = cmd.y;
+            break;
+          }
+          case 'Q':
+            for (const p of sampleQuadratic(x, y, cmd.x1, cmd.y1, cmd.x, cmd.y, qSegs)) {
+              flat.push({ type: 'L', x: p.x, y: p.y });
+            }
+            x = cmd.x;
+            y = cmd.y;
+            break;
+          case 'C':
+            for (const p of sampleCubic(x, y, cmd.x1, cmd.y1, cmd.x2, cmd.y2, cmd.x, cmd.y, cSegs)) {
+              flat.push({ type: 'L', x: p.x, y: p.y });
+            }
+            x = cmd.x;
+            y = cmd.y;
+            break;
+          case 'Z':
+            flat.push({ type: 'Z' });
+            x = startX;
+            y = startY;
+            break;
+        }
+      }
+
+      return flat;
+    }
+
+    function transformPathCommands(commands, transformFn) {
+      return commands.map(cmd => {
+        const newCmd = { type: cmd.type };
+        if (cmd.x !== undefined) {
+          const p = transformFn(cmd.x, cmd.y);
+          newCmd.x = p.x;
+          newCmd.y = p.y;
+        }
+        if (cmd.x1 !== undefined) {
+          const p = transformFn(cmd.x1, cmd.y1);
+          newCmd.x1 = p.x;
+          newCmd.y1 = p.y;
+        }
+        if (cmd.x2 !== undefined) {
+          const p = transformFn(cmd.x2, cmd.y2);
+          newCmd.x2 = p.x;
+          newCmd.y2 = p.y;
+        }
+        return newCmd;
+      });
+    }
+
+    function drawPathCommands(ctx, commands, fill = '#fff') {
+      ctx.beginPath();
+      for (const cmd of commands) {
+        switch (cmd.type) {
+          case 'M': ctx.moveTo(cmd.x, cmd.y); break;
+          case 'L': ctx.lineTo(cmd.x, cmd.y); break;
+          case 'Q': ctx.quadraticCurveTo(cmd.x1, cmd.y1, cmd.x, cmd.y); break;
+          case 'C': ctx.bezierCurveTo(cmd.x1, cmd.y1, cmd.x2, cmd.y2, cmd.x, cmd.y); break;
+          case 'Z': ctx.closePath(); break;
+        }
+      }
+      ctx.fillStyle = fill;
+      ctx.fill();
+    }
+
+    // ============ PIXEL EXTRACTION ============
+    // Extract ONCE from original untransformed glyph
+
+    function extractPixelsFromGlyph(path, bounds, resolution = 1, skip = 1) {
+      const padding = 10;
+
+      // Render at higher resolution for oversampling
+      const scale = resolution;
+      const w = Math.ceil((bounds.width + padding * 2) * scale);
+      const h = Math.ceil((bounds.height + padding * 2) * scale);
+
+      const offscreen = document.createElement('canvas');
+      offscreen.width = w;
+      offscreen.height = h;
+      const offCtx = offscreen.getContext('2d');
+
+      // Scale and translate to fit
+      offCtx.scale(scale, scale);
+      offCtx.translate(-bounds.x1 + padding, -bounds.y1 + padding);
+
+      // Draw path to offscreen canvas
+      offCtx.beginPath();
+      for (const cmd of path.commands) {
+        switch (cmd.type) {
+          case 'M': offCtx.moveTo(cmd.x, cmd.y); break;
+          case 'L': offCtx.lineTo(cmd.x, cmd.y); break;
+          case 'Q': offCtx.quadraticCurveTo(cmd.x1, cmd.y1, cmd.x, cmd.y); break;
+          case 'C': offCtx.bezierCurveTo(cmd.x1, cmd.y1, cmd.x2, cmd.y2, cmd.x, cmd.y); break;
+          case 'Z': offCtx.closePath(); break;
+        }
+      }
+      offCtx.fillStyle = '#fff';
+      offCtx.fill();
+
+      // Extract pixels
+      const imageData = offCtx.getImageData(0, 0, w, h);
+      const extracted = [];
+
+      for (let py = 0; py < h; py += skip) {
+        for (let px = 0; px < w; px += skip) {
+          const i = (py * w + px) * 4;
+          const alpha = imageData.data[i + 3];
+          if (alpha > 128) {
+            // Convert back to original coordinate space
+            const homeX = bounds.x1 - padding + px / scale;
+            const homeY = bounds.y1 - padding + py / scale;
+            extracted.push({
+              home: { x: homeX, y: homeY },
+              pos: { x: homeX, y: homeY },
+              vel: { x: 0, y: 0 },
+              target: { x: homeX, y: homeY },
+              alpha: alpha / 255
+            });
+          }
+        }
+      }
+
+      return extracted;
+    }
+
+    function getPathBounds(path) {
+      let x1 = Infinity, y1 = Infinity, x2 = -Infinity, y2 = -Infinity;
+
+      for (const cmd of path.commands) {
+        if (cmd.x !== undefined) {
+          x1 = Math.min(x1, cmd.x);
+          x2 = Math.max(x2, cmd.x);
+          y1 = Math.min(y1, cmd.y);
+          y2 = Math.max(y2, cmd.y);
+        }
+        if (cmd.x1 !== undefined) {
+          x1 = Math.min(x1, cmd.x1);
+          x2 = Math.max(x2, cmd.x1);
+          y1 = Math.min(y1, cmd.y1);
+          y2 = Math.max(y2, cmd.y1);
+        }
+        if (cmd.x2 !== undefined) {
+          x1 = Math.min(x1, cmd.x2);
+          x2 = Math.max(x2, cmd.x2);
+          y1 = Math.min(y1, cmd.y2);
+          y2 = Math.max(y2, cmd.y2);
+        }
+      }
+
+      return { x1, y1, x2, y2, width: x2 - x1, height: y2 - y1 };
+    }
+
+    // ============ INIT LEADERS & FOLLOWERS ============
+
+    function generateFollowers() {
+      const numFollowers = parseInt(document.getElementById('followers').value);
+      const spread = parseInt(document.getElementById('spread').value);
+
+      followers = [];
+      for (let i = 0; i < leaders.length; i++) {
+        for (let j = 0; j < numFollowers; j++) {
+          // Precompute stable random offset for each follower
+          const angle = Math.random() * Math.PI * 2;
+          const dist = Math.random() * spread;
+          followers.push({
+            leaderIdx: i,
+            offsetX: Math.cos(angle) * dist,
+            offsetY: Math.sin(angle) * dist
+          });
+        }
+      }
+
+      document.getElementById('pixelStatus').textContent = `Leaders: ${leaders.length}, Followers: ${followers.length}`;
+    }
+
+    function initPixels() {
+      if (!font) return;
+
+      const text = document.getElementById('textInput').value || 'A';
+      const fontSize = parseInt(document.getElementById('fontSize').value);
+      const resolution = parseFloat(document.getElementById('resolution').value);
+      const skip = parseInt(document.getElementById('skip').value);
+
+      // Get path for original glyph
+      glyphPath = font.getPath(text, 0, 0, fontSize);
+      glyphBounds = getPathBounds(glyphPath);
+
+      // Calculate centering offset
+      canvasOffset.x = (canvas.width - glyphBounds.width) / 2 - glyphBounds.x1;
+      canvasOffset.y = (canvas.height - glyphBounds.height) / 2 - glyphBounds.y1;
+
+      // Extract leaders ONCE
+      leaders = extractPixelsFromGlyph(glyphPath, glyphBounds, resolution, skip);
+
+      // Generate followers
+      generateFollowers();
+    }
+
+    // ============ RENDER ============
+
+    function render() {
+      if (!font) return;
+
+      const pixelMode = document.getElementById('pixelMode').checked;
+      const showGlyph = document.getElementById('showGlyph').checked;
+      const pixelSize = parseInt(document.getElementById('pixelSize').value);
+
+      // In pixel mode, need leaders extracted
+      if (pixelMode && leaders.length === 0) return;
+
+      let amount = parseInt(document.getElementById('amount').value) / 100;
+      let secondary = parseInt(document.getElementById('secondary').value) / 100;
+
+      // Scale amounts based on transform type
+      const amountScales = {
+        skewX: Math.PI / 4,
+        skewY: Math.PI / 4,
+        stretch: 1,
+        rotate: Math.PI,
+        twist: Math.PI,
+        bend: 100,
+        wave: 20,
+        taper: 1,
+        bulge: 0.5,
+        flag: 30
+      };
+
+      const scale = amountScales[currentTransform] || 1;
+      amount *= scale;
+      secondary *= scale;
+
+      // Animation - sample from curve editor (time or scroll driven)
+      if (animating || scrollBound) {
+        const t = (animationPhase % (Math.PI * 2)) / (Math.PI * 2);
+        amount = sampleCurve(t) * scale;
+        secondary = sampleCurve((t + 0.25) % 1) * scale * 0.5; // offset phase for secondary
+      }
+
+      // Build transform function for current settings
+      const transformPoint = buildTransformFunction(currentTransform, amount, secondary, glyphBounds);
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.save();
+      ctx.translate(canvasOffset.x, canvasOffset.y);
+
+      // Draw original glyph (ghost)
+      if (showGlyph) {
+        ctx.beginPath();
+        for (const cmd of glyphPath.commands) {
+          switch (cmd.type) {
+            case 'M': ctx.moveTo(cmd.x, cmd.y); break;
+            case 'L': ctx.lineTo(cmd.x, cmd.y); break;
+            case 'Q': ctx.quadraticCurveTo(cmd.x1, cmd.y1, cmd.x, cmd.y); break;
+            case 'C': ctx.bezierCurveTo(cmd.x1, cmd.y1, cmd.x2, cmd.y2, cmd.x, cmd.y); break;
+            case 'Z': ctx.closePath(); break;
+          }
+        }
+        ctx.fillStyle = '#222';
+        ctx.fill();
+      }
+
+      if (pixelMode) {
+        // PIXEL MODE: Transform leaders, draw followers
+        const scatter = parseInt(document.getElementById('scatter').value);
+        const nLeaders = leaders.length;
+        const nFollowers = followers.length;
+
+        // Compute leader positions from transform
+        for (let i = 0; i < nLeaders; i++) {
+          const leader = leaders[i];
+          const transformed = transformPoint(leader.home.x, leader.home.y);
+          leader.pos.x = transformed.x;
+          leader.pos.y = transformed.y;
+        }
+
+        // Draw followers at leader.pos + offset
+        if (pixelSize === 1 && scatter === 0) {
+          // Fast path: direct pixel manipulation
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imageData.data;
+          const w = canvas.width;
+          const ox = canvasOffset.x;
+          const oy = canvasOffset.y;
+
+          for (let i = 0; i < nFollowers; i++) {
+            const f = followers[i];
+            const leader = leaders[f.leaderIdx];
+            const px = (leader.pos.x + f.offsetX + ox) | 0;
+            const py = (leader.pos.y + f.offsetY + oy) | 0;
+            if (px >= 0 && px < canvas.width && py >= 0 && py < canvas.height) {
+              const idx = (py * w + px) * 4;
+              data[idx] = 255;
+              data[idx + 1] = 255;
+              data[idx + 2] = 255;
+              data[idx + 3] = 255;
+            }
+          }
+          ctx.restore();
+          ctx.putImageData(imageData, 0, 0);
+          ctx.save();
+        } else {
+          // Normal path with fillRect
+          ctx.fillStyle = '#fff';
+          const halfSize = pixelSize / 2;
+          if (scatter > 0) {
+            for (let i = 0; i < nFollowers; i++) {
+              const f = followers[i];
+              const leader = leaders[f.leaderIdx];
+              const sx = (Math.random() - 0.5) * scatter;
+              const sy = (Math.random() - 0.5) * scatter;
+              ctx.fillRect(leader.pos.x + f.offsetX + sx - halfSize, leader.pos.y + f.offsetY + sy - halfSize, pixelSize, pixelSize);
+            }
+          } else {
+            for (let i = 0; i < nFollowers; i++) {
+              const f = followers[i];
+              const leader = leaders[f.leaderIdx];
+              ctx.fillRect(leader.pos.x + f.offsetX - halfSize, leader.pos.y + f.offsetY - halfSize, pixelSize, pixelSize);
+            }
+          }
+        }
+      } else {
+        // VECTOR MODE: Transform path and draw filled
+        const affineTransforms = ['none', 'skewX', 'skewY', 'stretch', 'rotate'];
+        const isAffine = affineTransforms.includes(currentTransform);
+        const highResTransforms = ['wave', 'flag'];
+        const needsHighRes = highResTransforms.includes(currentTransform);
+
+        // Flatten for non-affine transforms
+        const sourceCommands = isAffine ? glyphPath.commands : flattenPath(glyphPath.commands, needsHighRes);
+
+        // Transform commands
+        const transformedCommands = transformPathCommands(sourceCommands, transformPoint);
+
+        // Draw
+        drawPathCommands(ctx, transformedCommands, '#fff');
+      }
+
+      ctx.restore();
+
+      // Update labels
+      document.getElementById('fontSizeVal').textContent = document.getElementById('fontSize').value;
+      document.getElementById('amountVal').textContent = (amount / scale).toFixed(2);
+      document.getElementById('secondaryVal').textContent = (secondary / scale).toFixed(2);
+      document.getElementById('resolutionVal').textContent = parseFloat(document.getElementById('resolution').value).toFixed(1) + 'x';
+      document.getElementById('skipVal').textContent = document.getElementById('skip').value;
+      document.getElementById('pixelSizeVal').textContent = pixelSize;
+      document.getElementById('followersVal').textContent = document.getElementById('followers').value;
+      document.getElementById('spreadVal').textContent = document.getElementById('spread').value;
+      document.getElementById('scatterVal').textContent = document.getElementById('scatter').value;
+      document.getElementById('repulsionVal').textContent = document.getElementById('repulsion').value;
+
+      // FPS calculation
+      frameCount++;
+      const now = performance.now();
+      if (now - lastFrameTime >= 1000) {
+        fps = frameCount;
+        frameCount = 0;
+        lastFrameTime = now;
+      }
+
+      const modeText = pixelMode ? `${followers.length} px` : 'vector';
+      info.textContent = `${modeText} | ${currentTransform}`;
+    }
+
+    // ============ ANIMATION LOOP ============
+
+    function animateLoop() {
+      if (!animating) return;
+
+      const speed = parseInt(document.getElementById('speed').value) / 10;
+      animationPhase += 0.03 * speed;
+      document.getElementById('speedVal').textContent = speed.toFixed(1);
+
+      render();
+      drawCurve(); // Update playhead
+      requestAnimationFrame(animateLoop);
+    }
+
+    // ============ EVENT HANDLERS ============
+
+    document.querySelectorAll('#transformBtns button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelector('#transformBtns button.active').classList.remove('active');
+        btn.classList.add('active');
+        currentTransform = btn.dataset.transform;
+        render();
+      });
+    });
+
+    // These trigger re-extraction
+    ['textInput', 'fontSize', 'resolution', 'skip'].forEach(id => {
+      document.getElementById(id).addEventListener('input', () => {
+        initPixels();
+        render();
+      });
+    });
+
+    // These just re-render
+    ['amount', 'secondary', 'pixelSize', 'scatter', 'repulsion'].forEach(id => {
+      document.getElementById(id).addEventListener('input', render);
+    });
+
+    // These regenerate followers
+    ['followers', 'spread'].forEach(id => {
+      document.getElementById(id).addEventListener('input', () => {
+        generateFollowers();
+        render();
+      });
+    });
+
+    ['showGlyph', 'pixelMode'].forEach(id => {
+      document.getElementById(id).addEventListener('change', render);
+    });
+
+    document.getElementById('animate').addEventListener('change', (e) => {
+      animating = e.target.checked;
+      if (animating) {
+        // Disable scroll bind if enabling animate
+        if (scrollBound) {
+          document.getElementById('scrollBind').checked = false;
+          scrollBound = false;
+          document.body.classList.remove('scroll-mode');
+          document.body.style.height = '';
+        }
+        requestAnimationFrame(animateLoop);
+      }
+    });
+
+    document.getElementById('scrollBind').addEventListener('change', (e) => {
+      scrollBound = e.target.checked;
+      if (scrollBound) {
+        // Disable animate if enabling scroll bind
+        if (animating) {
+          document.getElementById('animate').checked = false;
+          animating = false;
+        }
+        document.body.classList.add('scroll-mode');
+        render();
+        drawCurve();
+      } else {
+        document.body.classList.remove('scroll-mode');
+      }
+    });
+
+    window.addEventListener('wheel', (e) => {
+      if (!scrollBound) return;
+      e.preventDefault();
+      // Use wheel delta to drive animation phase
+      const speed = parseInt(document.getElementById('speed').value) / 10;
+      animationPhase += e.deltaY * 0.005 * speed;
+      window.scrollProgress = (animationPhase % (Math.PI * 2)) / (Math.PI * 2);
+      render();
+      drawCurve();
+    }, { passive: false });
+
+    // Keyboard: Space toggles animation
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && e.target.tagName !== 'INPUT') {
+        e.preventDefault();
+        const checkbox = document.getElementById('animate');
+        checkbox.checked = !checkbox.checked;
+        checkbox.dispatchEvent(new Event('change'));
+      }
+    });
+
+    // ============ INIT ============
+
+    async function init() {
+      try {
+        // Init curve editor
+        initCurveCanvas();
+        drawCurve();
+
+        font = await opentype.load('../../materials/fonts/ADolphin-Roman.otf');
+        info.textContent = 'Font loaded';
+        initPixels();
+        render();
+      } catch (e) {
+        info.textContent = 'Font load error: ' + e.message;
+        console.error(e);
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>06 - LSD</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0a;
+      overflow: hidden;
+      font-family: system-ui;
+    }
+    #info {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      color: #666;
+      font-size: 12px;
+      z-index: 100;
+    }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <div id="info">Loading...</div>
+
+  <script type="module">
+    import { SvgRenderer } from '../../lib/svg-renderer.js';
+
+    const poems = [
+      '../../materials/raw/Instagram Post – 10.svg',
+      '../../materials/raw/Instagram Post – 50.svg',
+      '../../materials/raw/Instagram Post – 100.svg',
+      '../../materials/raw/Instagram Post – 200.svg',
+      '../../materials/raw/Instagram Post – 300.svg',
+    ];
+
+    const renderer = new SvgRenderer(document.body);
+    
+    await renderer.loadPoems(poems);
+    
+    renderer.bindScroll({
+      sensitivity: 0.001,
+      smoothing: 0.05,
+      onProgress: (progress, index) => {
+        document.getElementById('info').textContent = 
+          `Poem ${index + 1}/${poems.length} - Scroll to navigate`;
+      }
+    });
+    
+    renderer.start();
+    
+    document.getElementById('info').textContent = 
+      `Poem 1/${poems.length} - Scroll to navigate`;
+  </script>
+</body>
+</html>

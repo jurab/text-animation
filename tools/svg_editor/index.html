@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SVG Text Editor</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0a;
+      color: #888;
+      font-family: system-ui;
+      font-size: 12px;
+    }
+    
+    /* Setup dialog */
+    #setupDialog {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.95);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    
+    #setupDialog.hidden {
+      display: none;
+    }
+    
+    .setup-box {
+      background: #1a1a1a;
+      padding: 30px;
+      border-radius: 8px;
+      width: 500px;
+    }
+    
+    .setup-box h2 {
+      color: #ccc;
+      margin-bottom: 20px;
+    }
+    
+    .setup-field {
+      margin-bottom: 20px;
+    }
+    
+    .setup-field label {
+      display: block;
+      margin-bottom: 8px;
+      color: #aaa;
+    }
+    
+    .setup-field input {
+      width: 100%;
+      padding: 8px 12px;
+      background: #0a0a0a;
+      border: 1px solid #333;
+      color: #ccc;
+      font-size: 13px;
+      border-radius: 4px;
+    }
+    
+    .setup-field input:focus {
+      outline: none;
+      border-color: #666;
+    }
+    
+    .setup-field small {
+      display: block;
+      margin-top: 4px;
+      color: #666;
+    }
+    
+    .setup-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+    
+    .setup-buttons button {
+      padding: 8px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    
+    .setup-buttons .primary {
+      background: #4a7c59;
+      color: #fff;
+    }
+    
+    .setup-buttons .secondary {
+      background: #333;
+      color: #aaa;
+    }
+    
+    /* Main UI */
+    #controls {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 100;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+    
+    #controls input[type="number"] { width: 60px; }
+    
+    #calibrationControls {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 100;
+      background: rgba(0,0,0,0.9);
+      padding: 15px;
+      border-radius: 4px;
+      width: 300px;
+    }
+    
+    #calibrationControls label {
+      display: block;
+      margin-bottom: 4px;
+    }
+    
+    #calibrationControls input[type="range"] {
+      width: 100%;
+      margin-bottom: 12px;
+    }
+    
+    #viewport {
+      position: fixed;
+      top: 50px;
+      left: 0;
+      right: 610px;
+      bottom: 0;
+      overflow: auto;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px;
+    }
+    
+    #canvasContainer {
+      position: relative;
+    }
+    
+    #groundTruth {
+      display: block;
+    }
+    
+    #renderCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
+    
+    #diffCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      display: none;
+    }
+    
+    #info {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      z-index: 100;
+    }
+    
+    #lineList {
+      position: fixed;
+      top: 50px;
+      right: 320px;
+      width: 280px;
+      max-height: calc(100vh - 60px);
+      overflow-y: auto;
+      background: rgba(0,0,0,0.9);
+      padding: 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      z-index: 100;
+    }
+    
+    #lineList h4 {
+      margin: 0 0 8px 0;
+      color: #aaa;
+    }
+    
+    .line-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 0;
+      border-bottom: 1px solid #222;
+    }
+    
+    .line-row:hover {
+      background: #1a1a1a;
+    }
+    
+    .line-row .line-text {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #666;
+    }
+    
+    .line-row .line-ls {
+      font-family: monospace;
+      color: #f80;
+      min-width: 50px;
+    }
+    
+    .line-row.has-006 .line-ls {
+      color: #f44;
+    }
+    
+    .line-row .fix-btn {
+      padding: 1px 4px;
+      font-size: 10px;
+      cursor: pointer;
+      background: #333;
+      border: 1px solid #555;
+      color: #888;
+    }
+    
+    .line-row .fix-btn.active {
+      background: #840;
+      border-color: #f80;
+      color: #fff;
+    }
+    
+    .nav-arrows {
+      display: flex;
+      gap: 4px;
+    }
+    
+    .nav-arrows button {
+      font-size: 16px;
+      padding: 2px 8px;
+    }
+    
+    .slider-row {
+      margin-bottom: 8px;
+    }
+    
+    .slider-row span {
+      float: right;
+      font-family: monospace;
+    }
+    
+    button {
+      margin-right: 8px;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+    
+    #modeButtons button.active {
+      background: #444;
+      color: #fff;
+    }
+    
+    #blockEditor {
+      position: fixed;
+      bottom: 10px;
+      right: 320px;
+      width: 280px;
+      background: rgba(0,0,0,0.9);
+      padding: 10px;
+      border-radius: 4px;
+      display: none;
+      z-index: 100;
+    }
+    
+    #blockEditor.active {
+      display: block;
+    }
+    
+    #blockEditor h4 {
+      margin: 0 0 10px 0;
+      color: #aaa;
+    }
+    
+    #blockEditor .field {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    
+    #blockEditor .field label {
+      width: 60px;
+    }
+    
+    #blockEditor .field input {
+      width: 80px;
+    }
+    
+    .block-highlight {
+      position: absolute;
+      border: 2px solid #0ff;
+      pointer-events: none;
+      box-sizing: border-box;
+    }
+    
+    .block-highlight.selected {
+      border-color: #f0f;
+    }
+  </style>
+</head>
+<body>
+  <!-- Setup Dialog -->
+  <div id="setupDialog">
+    <div class="setup-box">
+      <h2>SVG Text Editor Setup</h2>
+      <div class="setup-field">
+        <label>SVG Folder URL</label>
+        <input type="text" id="svgFolderInput" placeholder="/path/to/svgs/">
+        <small>Base URL for SVG files (e.g., /materials/raw/)</small>
+      </div>
+      <div class="setup-field">
+        <label>PNG Folder URL</label>
+        <input type="text" id="pngFolderInput" placeholder="/path/to/pngs/">
+        <small>Base URL for ground truth PNGs (e.g., /workshop/workbench/png_export/)</small>
+      </div>
+      <div class="setup-field">
+        <label>Fonts Folder URL</label>
+        <input type="text" id="fontsFolderInput" placeholder="/path/to/fonts/">
+        <small>Base URL for font files</small>
+      </div>
+      <div class="setup-field">
+        <label>File Pattern</label>
+        <input type="text" id="filePatternInput" placeholder="Instagram Post - {num}.svg">
+        <small>Use {num} as placeholder for poem number</small>
+      </div>
+      <div class="setup-buttons">
+        <button class="secondary" id="setupResetBtn">Reset to Defaults</button>
+        <button class="secondary" id="setupCancelBtn">Cancel</button>
+        <button class="primary" id="setupSaveBtn">Save & Start</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="controls">
+    <div>
+      Poem: <input type="number" id="poemNum" value="5" min="1" max="999">
+      <button id="loadBtn">Load</button>
+      <span class="nav-arrows">
+        <button id="prevBtn">-</button>
+        <button id="nextBtn">+</button>
+      </span>
+    </div>
+    <div id="modeButtons">
+      <button id="modeRender">Render</button>
+      <button id="modeOverlay">Overlay</button>
+      <button id="modeDiff">Diff</button>
+      <button id="modeBoxes">Boxes</button>
+      <button id="modeMoveBlocks">Move</button>
+    </div>
+    <div>
+      <label><input type="checkbox" id="showItalic" checked> Show italic</label>
+    </div>
+    <button id="settingsBtn">Settings</button>
+  </div>
+  
+  <div id="lineList"></div>
+  
+  <div id="calibrationControls">
+    <strong>Calibration</strong>
+    <hr style="margin: 10px 0; border-color: #333;">
+    
+    <div class="slider-row">
+      <label>Render opacity <span id="opacityVal">50%</span></label>
+      <input type="range" id="opacity" min="0" max="100" value="50">
+    </div>
+    
+    <div class="slider-row">
+      <label>Kerning scale <span id="kernVal">1.000</span></label>
+      <input type="range" id="kernScale" min="800" max="1200" value="1000">
+    </div>
+    
+    <div class="slider-row">
+      <label>Letter-spacing scale <span id="lsVal">1.000</span></label>
+      <input type="range" id="lsScale" min="0" max="2000" value="1000">
+    </div>
+    
+    <div class="slider-row">
+      <label>Letter-spacing offset (em) <span id="lsOffsetVal">0.000</span></label>
+      <input type="range" id="lsOffset" min="-100" max="100" value="0">
+    </div>
+    
+    <div class="slider-row">
+      <label>Baseline offset (px) <span id="baselineVal">0.0</span></label>
+      <input type="range" id="baselineOffset" min="-50" max="50" value="0">
+    </div>
+    
+    <div class="slider-row">
+      <label>X offset (px) <span id="xOffsetVal">0.0</span></label>
+      <input type="range" id="xOffset" min="-50" max="50" value="0">
+    </div>
+    
+    <div class="slider-row">
+      <label>Space width scale <span id="spaceVal">1.000</span></label>
+      <input type="range" id="spaceScale" min="500" max="1500" value="1000">
+    </div>
+    
+    <div class="slider-row">
+      <label><input type="checkbox" id="spaceLs" checked> Apply letter-spacing to spaces</label>
+    </div>
+    
+    <div class="slider-row">
+      <label><input type="checkbox" id="noMirrorKern"> Disable kerning for mirrored text</label>
+    </div>
+    
+    <div class="slider-row">
+      <label><input type="checkbox" id="noMirrorLs"> Disable letter-spacing for mirrored text</label>
+    </div>
+    
+    <hr style="margin: 10px 0; border-color: #333;">
+    
+    <button id="saveBtn">Save Calibration</button>
+    <button id="fixSvgBtn">Fix SVG</button>
+    <button id="resetBtn">Reset</button>
+    
+    <hr style="margin: 10px 0; border-color: #333;">
+    
+    <div id="stats" style="font-family: monospace; font-size: 11px;"></div>
+  </div>
+  
+  <div id="viewport">
+    <div id="canvasContainer">
+      <img id="groundTruth" src="">
+      <canvas id="renderCanvas"></canvas>
+      <canvas id="diffCanvas"></canvas>
+    </div>
+  </div>
+  
+  <div id="info">Loading...</div>
+  
+  <div id="blockEditor">
+    <h4>Block: <span id="blockName">-</span></h4>
+    <div class="field">
+      <label>Offset X:</label>
+      <input type="number" id="blockOffsetX" value="0" step="1">
+      <span>px</span>
+    </div>
+    <div class="field">
+      <label>Offset Y:</label>
+      <input type="number" id="blockOffsetY" value="0" step="1">
+      <span>px</span>
+    </div>
+    <div style="margin-top: 10px; color: #666; font-size: 11px;">
+      Arrow keys: move by 1px<br>
+      Shift+Arrow: move by 10px
+    </div>
+  </div>
+
+  <script type="module">
+    import { SvgTextRenderer } from '../../lib/svg-renderer.js';
+    
+    // ============ CONFIG ============
+    
+    const DEFAULT_CONFIG = {
+      svgFolder: '/materials/raw/',
+      pngFolder: '/workshop/workbench/png_export/',
+      fontsFolder: '/materials/fonts/',
+      filePattern: 'Instagram Post – {num}.svg'
+    };
+    
+    function loadConfig() {
+      const saved = localStorage.getItem('svgEditorConfig');
+      if (saved) {
+        return { ...DEFAULT_CONFIG, ...JSON.parse(saved) };
+      }
+      return null;
+    }
+    
+    function saveConfig(config) {
+      localStorage.setItem('svgEditorConfig', JSON.stringify(config));
+    }
+    
+    // ============ SETUP DIALOG ============
+    
+    const setupDialog = document.getElementById('setupDialog');
+    const svgFolderInput = document.getElementById('svgFolderInput');
+    const pngFolderInput = document.getElementById('pngFolderInput');
+    const fontsFolderInput = document.getElementById('fontsFolderInput');
+    const filePatternInput = document.getElementById('filePatternInput');
+    
+    function showSetup(config = DEFAULT_CONFIG) {
+      svgFolderInput.value = config.svgFolder;
+      pngFolderInput.value = config.pngFolder;
+      fontsFolderInput.value = config.fontsFolder;
+      filePatternInput.value = config.filePattern;
+      setupDialog.classList.remove('hidden');
+    }
+    
+    function hideSetup() {
+      setupDialog.classList.add('hidden');
+    }
+    
+    document.getElementById('setupSaveBtn').addEventListener('click', () => {
+      const config = {
+        svgFolder: svgFolderInput.value,
+        pngFolder: pngFolderInput.value,
+        fontsFolder: fontsFolderInput.value,
+        filePattern: filePatternInput.value
+      };
+      saveConfig(config);
+      hideSetup();
+      init(config);
+    });
+    
+    document.getElementById('setupCancelBtn').addEventListener('click', () => {
+      const config = loadConfig();
+      if (config) {
+        hideSetup();
+      }
+    });
+    
+    document.getElementById('settingsBtn').addEventListener('click', () => {
+      showSetup(loadConfig() || DEFAULT_CONFIG);
+    });
+    
+    // ============ MAIN APP ============
+    
+    let renderer = null;
+    let currentBlocks = [];
+    let currentPoemNum = 5;
+    let currentSvgText = '';
+    let lineOverrides = {};
+    let currentConfig = null;
+    
+    const groundTruth = document.getElementById('groundTruth');
+    const renderCanvas = document.getElementById('renderCanvas');
+    const diffCanvas = document.getElementById('diffCanvas');
+    const renderCtx = renderCanvas.getContext('2d');
+    const diffCtx = diffCanvas.getContext('2d');
+    const info = document.getElementById('info');
+    const stats = document.getElementById('stats');
+    
+    let calibration = {
+      kernScale: 1.0,
+      lsScale: 1.0,
+      lsOffset: 0,
+      baselineOffset: 0,
+      xOffset: 0,
+      spaceScale: 1.0,
+      spaceLs: true,
+      noMirrorKern: false,
+      noMirrorLs: false
+    };
+    
+    // Load saved calibration
+    const savedCalibration = localStorage.getItem('svgEditorCalibration');
+    if (savedCalibration) {
+      calibration = { ...calibration, ...JSON.parse(savedCalibration) };
+      document.getElementById('kernScale').value = calibration.kernScale * 1000;
+      document.getElementById('lsScale').value = calibration.lsScale * 1000;
+      document.getElementById('lsOffset').value = calibration.lsOffset * 1000;
+      document.getElementById('baselineOffset').value = calibration.baselineOffset;
+      document.getElementById('xOffset').value = calibration.xOffset;
+      document.getElementById('spaceScale').value = calibration.spaceScale * 1000;
+      document.getElementById('spaceLs').checked = calibration.spaceLs;
+      document.getElementById('noMirrorKern').checked = calibration.noMirrorKern;
+      document.getElementById('noMirrorLs').checked = calibration.noMirrorLs;
+    }
+    
+    let currentMode = localStorage.getItem('svgEditorViewMode') || 'overlay';
+    let selectedBlockIndex = -1;
+    let blockOffsets = {};
+    
+    async function init(config) {
+      currentConfig = config;
+      info.textContent = 'Loading fonts...';
+      
+      try {
+        renderer = new SvgTextRenderer();
+        await renderer.loadFonts({
+          regular: config.fontsFolder + 'ADolphin-Roman.otf',
+          italic: config.fontsFolder + 'ADolphin-Italic.otf',
+          txtRegular: config.fontsFolder + 'ADolphin-Roman.otf',
+          txtItalic: config.fontsFolder + 'ADolphin-Italic.otf',
+          fleurons: config.fontsFolder + 'ADolphin-Fleurons.otf'
+        });
+        
+        info.textContent = 'Fonts loaded.';
+        setMode(currentMode);
+        loadPoem(currentPoemNum);
+      } catch (e) {
+        info.textContent = `Font load error: ${e.message}`;
+        console.error(e);
+      }
+    }
+    
+    async function loadPoem(num) {
+      currentPoemNum = num;
+      
+      const allOverrides = JSON.parse(localStorage.getItem('svgEditorLineOverrides') || '{}');
+      lineOverrides = allOverrides[num] || {};
+      
+      const svgFileName = currentConfig.filePattern.replace('{num}', num);
+      const svgUrl = `${currentConfig.svgFolder}${svgFileName}?t=${Date.now()}`;
+      
+      try {
+        const response = await fetch(svgUrl);
+        if (!response.ok) {
+          info.textContent = `No SVG found for poem ${num}`;
+          return;
+        }
+        currentSvgText = await response.text();
+      } catch (e) {
+        info.textContent = `Error loading SVG: ${e.message}`;
+        return;
+      }
+      
+      renderer.setCalibration(calibration);
+      currentBlocks = renderer.parse(currentSvgText, { lineOverrides });
+      
+      updateLineList();
+      
+      const pngFileName = currentConfig.filePattern.replace('{num}', num).replace('.svg', '.png');
+      const pngUrl = `${currentConfig.pngFolder}${pngFileName}`;
+      groundTruth.src = pngUrl;
+      groundTruth.onerror = () => {
+        info.textContent = `No PNG for poem ${num}`;
+        renderCanvas.width = 1080;
+        renderCanvas.height = 1080;
+        diffCanvas.width = 1080;
+        diffCanvas.height = 1080;
+        groundTruth.style.visibility = 'hidden';
+        render();
+      };
+      groundTruth.onload = () => {
+        groundTruth.style.visibility = currentMode === 'overlay' ? 'visible' : 'hidden';
+        renderCanvas.width = groundTruth.naturalWidth;
+        renderCanvas.height = groundTruth.naturalHeight;
+        diffCanvas.width = groundTruth.naturalWidth;
+        diffCanvas.height = groundTruth.naturalHeight;
+        render();
+      };
+    }
+    
+    function render() {
+      if (!renderer || currentBlocks.length === 0) return;
+      
+      const width = renderCanvas.width;
+      const height = renderCanvas.height;
+      
+      renderCtx.clearRect(0, 0, width, height);
+      
+      renderer.setCalibration(calibration);
+      renderer.layout(currentBlocks);
+      
+      const blockOffsetsArray = currentBlocks.map((_, i) => blockOffsets[i] || { x: 0, y: 0 });
+      
+      renderer.renderToContext(renderCtx, currentBlocks, {
+        showBoxes: currentMode === 'boxes' || (currentMode === 'moveBlocks' && selectedBlockIndex >= 0),
+        showItalic: document.getElementById('showItalic').checked,
+        blockOffsets: blockOffsetsArray
+      });
+      
+      renderCanvas.style.opacity = document.getElementById('opacity').value / 100;
+      
+      if (currentMode === 'diff') {
+        const gtCanvas = document.createElement('canvas');
+        gtCanvas.width = width;
+        gtCanvas.height = height;
+        const gtCtx = gtCanvas.getContext('2d');
+        gtCtx.drawImage(groundTruth, 0, 0);
+        
+        const diff = computeDiff(gtCtx, renderCtx, width, height);
+        diffCtx.clearRect(0, 0, width, height);
+        diffCtx.drawImage(diff.canvas, 0, 0);
+        
+        stats.innerHTML = `Diff pixels: ${diff.pixelCount.toLocaleString()}<br>Mean diff: ${diff.meanDiff.toFixed(1)}<br>Total diff: ${diff.totalDiff.toLocaleString()}`;
+      } else {
+        const block = currentBlocks[0];
+        if (block && block.lines[0]) {
+          const fontSize = block.lines[0].fontSize;
+          const ls = block.lines[0].letterSpacing;
+          stats.innerHTML = `Font size: ${fontSize}px<br>Letter-spacing: ${ls.toFixed(3)}em`;
+        }
+      }
+      
+      updateSliderLabels();
+    }
+    
+    function computeDiff(ctx1, ctx2, width, height) {
+      const data1 = ctx1.getImageData(0, 0, width, height).data;
+      const data2 = ctx2.getImageData(0, 0, width, height).data;
+      
+      const diffCanvas = document.createElement('canvas');
+      diffCanvas.width = width;
+      diffCanvas.height = height;
+      const diffCtx = diffCanvas.getContext('2d');
+      const diffData = diffCtx.createImageData(width, height);
+      
+      let totalDiff = 0;
+      let pixelCount = 0;
+      
+      for (let i = 0; i < data1.length; i += 4) {
+        const r1 = data1[i], g1 = data1[i+1], b1 = data1[i+2];
+        const r2 = data2[i], g2 = data2[i+1], b2 = data2[i+2];
+        
+        const diff = Math.abs(r1 - r2) + Math.abs(g1 - g2) + Math.abs(b1 - b2);
+        
+        if (diff > 0) {
+          const hasGT = (r1 + g1 + b1) > 30;
+          const hasRender = (r2 + g2 + b2) > 30;
+          
+          if (hasGT && !hasRender) {
+            diffData.data[i] = 255;
+            diffData.data[i+1] = 0;
+            diffData.data[i+2] = 0;
+          } else if (!hasGT && hasRender) {
+            diffData.data[i] = 0;
+            diffData.data[i+1] = 255;
+            diffData.data[i+2] = 0;
+          } else {
+            diffData.data[i] = 255;
+            diffData.data[i+1] = 255;
+            diffData.data[i+2] = 0;
+          }
+          diffData.data[i+3] = Math.min(255, diff);
+          
+          totalDiff += diff;
+          pixelCount++;
+        } else {
+          diffData.data[i+3] = 0;
+        }
+      }
+      
+      diffCtx.putImageData(diffData, 0, 0);
+      
+      return { canvas: diffCanvas, totalDiff, pixelCount, meanDiff: pixelCount > 0 ? totalDiff / pixelCount : 0 };
+    }
+    
+    function setMode(mode) {
+      currentMode = mode;
+      localStorage.setItem('svgEditorViewMode', mode);
+      
+      document.querySelectorAll('#modeButtons button').forEach(b => b.classList.remove('active'));
+      const modeBtn = document.getElementById('mode' + mode.charAt(0).toUpperCase() + mode.slice(1));
+      if (modeBtn) modeBtn.classList.add('active');
+      
+      const showGT = mode === 'overlay' || mode === 'moveBlocks';
+      const showRender = mode === 'render' || mode === 'overlay' || mode === 'boxes' || mode === 'moveBlocks';
+      const showDiff = mode === 'diff';
+      const showBlockEditor = mode === 'moveBlocks';
+      
+      groundTruth.style.visibility = showGT ? 'visible' : 'hidden';
+      renderCanvas.style.display = showRender ? 'block' : 'none';
+      diffCanvas.style.display = showDiff ? 'block' : 'none';
+      renderCanvas.style.pointerEvents = 'auto';
+      
+      document.getElementById('blockEditor').classList.toggle('active', showBlockEditor);
+      
+      if (!showBlockEditor) {
+        selectedBlockIndex = -1;
+      }
+      
+      render();
+    }
+    
+    function getBlockBounds(block) {
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      const { tx, ty, scaleX = 1, scaleY = 1 } = block.transform;
+      const offset = blockOffsets[currentBlocks.indexOf(block)] || { x: 0, y: 0 };
+      
+      for (const line of block.lines) {
+        for (const word of line.words) {
+          for (const letter of word.letters) {
+            const lx = tx + offset.x + letter.x * scaleX;
+            const ly = ty + offset.y + letter.y * scaleY;
+            const bx = lx + letter.bbox.x1 * scaleX;
+            const by = ly - letter.bbox.y2 * Math.abs(scaleY);
+            
+            minX = Math.min(minX, bx);
+            minY = Math.min(minY, by);
+            maxX = Math.max(maxX, bx + letter.bbox.width * Math.abs(scaleX));
+            maxY = Math.max(maxY, by + letter.bbox.height * Math.abs(scaleY));
+          }
+        }
+      }
+      
+      return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+    }
+    
+    function selectBlock(index) {
+      selectedBlockIndex = index;
+      const block = currentBlocks[index];
+      if (!block) return;
+      
+      const firstLine = block.lines[0];
+      const text = firstLine ? firstLine.segments.map(s => s.text).join('').substring(0, 20) : '?';
+      document.getElementById('blockName').textContent = `#${index}: ${text}...`;
+      
+      const offset = blockOffsets[index] || { x: 0, y: 0 };
+      document.getElementById('blockOffsetX').value = offset.x;
+      document.getElementById('blockOffsetY').value = offset.y;
+      
+      render();
+    }
+    
+    function updateBlockOffset(dx, dy) {
+      if (selectedBlockIndex < 0) return;
+      
+      if (!blockOffsets[selectedBlockIndex]) {
+        blockOffsets[selectedBlockIndex] = { x: 0, y: 0 };
+      }
+      
+      blockOffsets[selectedBlockIndex].x += dx;
+      blockOffsets[selectedBlockIndex].y += dy;
+      
+      document.getElementById('blockOffsetX').value = blockOffsets[selectedBlockIndex].x;
+      document.getElementById('blockOffsetY').value = blockOffsets[selectedBlockIndex].y;
+      
+      render();
+    }
+    
+    function updateSliderLabels() {
+      document.getElementById('opacityVal').textContent = document.getElementById('opacity').value + '%';
+      document.getElementById('kernVal').textContent = calibration.kernScale.toFixed(3);
+      document.getElementById('lsVal').textContent = calibration.lsScale.toFixed(3);
+      document.getElementById('lsOffsetVal').textContent = calibration.lsOffset.toFixed(3);
+      document.getElementById('baselineVal').textContent = calibration.baselineOffset.toFixed(1);
+      document.getElementById('xOffsetVal').textContent = calibration.xOffset.toFixed(1);
+      document.getElementById('spaceVal').textContent = calibration.spaceScale.toFixed(3);
+    }
+    
+    function onSliderChange() {
+      calibration.kernScale = document.getElementById('kernScale').value / 1000;
+      calibration.lsScale = document.getElementById('lsScale').value / 1000;
+      calibration.lsOffset = document.getElementById('lsOffset').value / 1000;
+      calibration.baselineOffset = parseFloat(document.getElementById('baselineOffset').value);
+      calibration.xOffset = parseFloat(document.getElementById('xOffset').value);
+      calibration.spaceScale = document.getElementById('spaceScale').value / 1000;
+      calibration.spaceLs = document.getElementById('spaceLs').checked;
+      calibration.noMirrorKern = document.getElementById('noMirrorKern').checked;
+      calibration.noMirrorLs = document.getElementById('noMirrorLs').checked;
+      render();
+    }
+    
+    function updateLineList() {
+      const container = document.getElementById('lineList');
+      container.innerHTML = '<h4>Lines</h4>';
+      
+      for (const block of currentBlocks) {
+        for (const line of block.lines) {
+          const text = line.segments.map(s => s.text).join('');
+          const ls = line.rawLetterSpacing;
+          const has006 = Math.abs(ls - 0.06) < 0.001;
+          const isFixed = lineOverrides[line.globalIndex]?.fix006;
+          
+          const row = document.createElement('div');
+          row.className = 'line-row' + (has006 ? ' has-006' : '');
+          
+          const lsSpan = document.createElement('span');
+          lsSpan.className = 'line-ls';
+          
+          const segLsValues = line.segments.map((s, i) => {
+            const ovr = lineOverrides[line.globalIndex]?.segmentLs?.[i];
+            return ovr !== undefined ? ovr : s.letterSpacing;
+          });
+          const allSame = segLsValues.every(v => Math.abs(v - segLsValues[0]) < 0.001);
+          
+          if (allSame) {
+            lsSpan.textContent = segLsValues[0].toFixed(3);
+          } else {
+            lsSpan.textContent = segLsValues.map(v => v.toFixed(2)).join('/');
+          }
+          
+          if (isFixed) lsSpan.style.textDecoration = 'line-through';
+          if (lineOverrides[line.globalIndex]?.segmentLs) lsSpan.style.color = '#0f0';
+          lsSpan.style.cursor = 'pointer';
+          lsSpan.title = 'Click to override letter-spacing per segment';
+          lsSpan.onclick = (e) => {
+            e.stopPropagation();
+            let msg = `Letter-spacing for segments:\n`;
+            line.segments.forEach((seg, i) => {
+              const ovr = lineOverrides[line.globalIndex]?.segmentLs?.[i];
+              const cur = ovr !== undefined ? ovr : seg.letterSpacing;
+              msg += `${i}: "${seg.text.substring(0,15)}..." = ${cur.toFixed(3)}em\n`;
+            });
+            msg += `\nEnter new values (comma-separated, e.g. "0,0.12"):`;
+            
+            const curVals = segLsValues.map(v => v.toFixed(3)).join(',');
+            const newVal = prompt(msg, curVals);
+            if (newVal !== null) {
+              const parts = newVal.split(',').map(s => parseFloat(s.trim()));
+              if (parts.length === line.segments.length && parts.every(p => !isNaN(p))) {
+                if (!lineOverrides[line.globalIndex]) {
+                  lineOverrides[line.globalIndex] = {};
+                }
+                lineOverrides[line.globalIndex].segmentLs = parts;
+                delete lineOverrides[line.globalIndex].letterSpacing;
+                reparse();
+              } else {
+                alert(`Need ${line.segments.length} values, got ${parts.length}`);
+              }
+            }
+          };
+          
+          const textSpan = document.createElement('span');
+          textSpan.className = 'line-text';
+          textSpan.textContent = text.substring(0, 30) + (text.length > 30 ? '...' : '');
+          textSpan.title = text;
+          
+          row.appendChild(lsSpan);
+          row.appendChild(textSpan);
+          
+          if (has006) {
+            const btn = document.createElement('button');
+            btn.className = 'fix-btn' + (isFixed ? ' active' : '');
+            btn.textContent = isFixed ? 'v' : '>0';
+            btn.onclick = () => {
+              if (!lineOverrides[line.globalIndex]) {
+                lineOverrides[line.globalIndex] = {};
+              }
+              lineOverrides[line.globalIndex].fix006 = !isFixed;
+              reparse();
+            };
+            row.appendChild(btn);
+          }
+          
+          container.appendChild(row);
+        }
+      }
+    }
+    
+    function reparse() {
+      currentBlocks = renderer.parse(currentSvgText, { lineOverrides });
+      updateLineList();
+      render();
+    }
+    
+    // Event listeners
+    document.getElementById('loadBtn').addEventListener('click', () => {
+      loadPoem(parseInt(document.getElementById('poemNum').value));
+    });
+    
+    document.getElementById('prevBtn').addEventListener('click', () => {
+      const num = Math.max(1, currentPoemNum - 1);
+      document.getElementById('poemNum').value = num;
+      loadPoem(num);
+    });
+    
+    document.getElementById('nextBtn').addEventListener('click', () => {
+      const num = Math.min(999, currentPoemNum + 1);
+      document.getElementById('poemNum').value = num;
+      loadPoem(num);
+    });
+    
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT') return;
+      
+      if (currentMode === 'moveBlocks' && selectedBlockIndex >= 0) {
+        const step = e.shiftKey ? 10 : 1;
+        if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          updateBlockOffset(-step, 0);
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          updateBlockOffset(step, 0);
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          updateBlockOffset(0, -step);
+        } else if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          updateBlockOffset(0, step);
+        }
+        return;
+      }
+      
+      if (e.key === 'ArrowLeft') {
+        document.getElementById('prevBtn').click();
+      } else if (e.key === 'ArrowRight') {
+        document.getElementById('nextBtn').click();
+      }
+    });
+    
+    renderCanvas.addEventListener('click', (e) => {
+      const rect = renderCanvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      for (let i = currentBlocks.length - 1; i >= 0; i--) {
+        const block = currentBlocks[i];
+        const bounds = getBlockBounds(block);
+        if (x >= bounds.x && x <= bounds.x + bounds.width &&
+            y >= bounds.y && y <= bounds.y + bounds.height) {
+          
+          if (currentMode === 'moveBlocks') {
+            selectBlock(i);
+            return;
+          }
+          
+          const firstLine = block.lines[0];
+          const text = firstLine ? firstLine.segments.map(s => s.text).join('') : '?';
+          const { tx, ty, rotation, scaleX, scaleY, matrix } = block.transform;
+          let infoText = `Block #${i}: "${text.substring(0, 30)}${text.length > 30 ? '...' : ''}"`;
+          infoText += `\ntx=${tx.toFixed(1)} ty=${ty.toFixed(1)}`;
+          if (rotation) infoText += ` rot=${rotation}deg`;
+          if (scaleX !== 1) infoText += ` scaleX=${scaleX}`;
+          if (scaleY !== 1) infoText += ` scaleY=${scaleY}`;
+          if (matrix) infoText += ` matrix=[${matrix.map(v => v.toFixed(2)).join(', ')}]`;
+          info.textContent = infoText;
+          return;
+        }
+      }
+      
+      info.textContent = `Click at (${x.toFixed(0)}, ${y.toFixed(0)}) - no element`;
+    });
+    
+    document.getElementById('blockOffsetX').addEventListener('input', (e) => {
+      if (selectedBlockIndex < 0) return;
+      if (!blockOffsets[selectedBlockIndex]) blockOffsets[selectedBlockIndex] = { x: 0, y: 0 };
+      blockOffsets[selectedBlockIndex].x = parseInt(e.target.value) || 0;
+      render();
+    });
+    
+    document.getElementById('blockOffsetY').addEventListener('input', (e) => {
+      if (selectedBlockIndex < 0) return;
+      if (!blockOffsets[selectedBlockIndex]) blockOffsets[selectedBlockIndex] = { x: 0, y: 0 };
+      blockOffsets[selectedBlockIndex].y = parseInt(e.target.value) || 0;
+      render();
+    });
+    
+    document.getElementById('modeRender').addEventListener('click', () => setMode('render'));
+    document.getElementById('modeOverlay').addEventListener('click', () => setMode('overlay'));
+    document.getElementById('modeDiff').addEventListener('click', () => setMode('diff'));
+    document.getElementById('modeBoxes').addEventListener('click', () => setMode('boxes'));
+    document.getElementById('modeMoveBlocks').addEventListener('click', () => setMode('moveBlocks'));
+    
+    document.getElementById('opacity').addEventListener('input', render);
+    document.getElementById('kernScale').addEventListener('input', onSliderChange);
+    document.getElementById('lsScale').addEventListener('input', onSliderChange);
+    document.getElementById('lsOffset').addEventListener('input', onSliderChange);
+    document.getElementById('baselineOffset').addEventListener('input', onSliderChange);
+    document.getElementById('xOffset').addEventListener('input', onSliderChange);
+    document.getElementById('spaceScale').addEventListener('input', onSliderChange);
+    document.getElementById('spaceLs').addEventListener('change', onSliderChange);
+    document.getElementById('noMirrorKern').addEventListener('change', onSliderChange);
+    document.getElementById('noMirrorLs').addEventListener('change', onSliderChange);
+    document.getElementById('showItalic').addEventListener('change', render);
+    
+    document.getElementById('saveBtn').addEventListener('click', () => {
+      localStorage.setItem('svgEditorCalibration', JSON.stringify(calibration));
+      const allOverrides = JSON.parse(localStorage.getItem('svgEditorLineOverrides') || '{}');
+      allOverrides[currentPoemNum] = lineOverrides;
+      localStorage.setItem('svgEditorLineOverrides', JSON.stringify(allOverrides));
+      info.textContent = 'Calibration saved!';
+    });
+    
+    document.getElementById('fixSvgBtn').addEventListener('click', async () => {
+      const hasLineFix = Object.values(lineOverrides).some(v => v.fix006 || v.segmentLs);
+      const hasBlockFix = Object.keys(blockOffsets).length > 0;
+      if (!hasLineFix && !hasBlockFix) {
+        info.textContent = 'No fixes to apply';
+        return;
+      }
+      
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(currentSvgText, 'image/svg+xml');
+      let fixCount = 0;
+      
+      const textElements = [...doc.querySelectorAll('text')].filter(el => 
+        el.textContent.trim().length > 0
+      );
+      
+      let blockIdx = 0;
+      for (const block of currentBlocks) {
+        const textEl = textElements[blockIdx];
+        const currentBlockIdx = blockIdx;
+        blockIdx++;
+        if (!textEl) continue;
+        
+        const offset = blockOffsets[currentBlockIdx];
+        if (offset && (offset.x !== 0 || offset.y !== 0)) {
+          const transform = textEl.getAttribute('transform') || '';
+          const translateMatch = transform.match(/translate\(([^,\s]+)[,\s]+([^)]+)\)/);
+          const matrixMatch = transform.match(/matrix\(([^)]+)\)/);
+          
+          if (matrixMatch) {
+            const parts = matrixMatch[1].split(/,\s*/).map(parseFloat);
+            parts[4] += offset.x;
+            parts[5] += offset.y;
+            const newTransform = transform.replace(matrixMatch[0], `matrix(${parts.join(', ')})`);
+            textEl.setAttribute('transform', newTransform);
+            fixCount++;
+          } else if (translateMatch) {
+            const newX = parseFloat(translateMatch[1]) + offset.x;
+            const newY = parseFloat(translateMatch[2]) + offset.y;
+            const newTransform = transform.replace(translateMatch[0], `translate(${newX} ${newY})`);
+            textEl.setAttribute('transform', newTransform);
+            fixCount++;
+          } else {
+            textEl.setAttribute('transform', `translate(${offset.x} ${offset.y})`);
+            fixCount++;
+          }
+        }
+        
+        for (const line of block.lines) {
+          const override = lineOverrides[line.globalIndex];
+          if (!override) continue;
+          
+          const lineText = line.segments.map(s => s.text).join('');
+          
+          const allTspans = [...textEl.querySelectorAll('tspan')];
+          const lineTspans = allTspans.filter(ts => {
+            const y = ts.getAttribute('y');
+            return y === String(line.y) || (!y && ts.parentElement.getAttribute('y') === String(line.y));
+          });
+          
+          const combinedText = lineTspans.map(ts => ts.textContent).join('');
+          if (!combinedText.includes(lineText.substring(0, 10))) continue;
+            
+          if (override.fix006) {
+            for (const tspan of lineTspans) {
+              const ls = tspan.getAttribute('letter-spacing');
+              if (ls === '0.06em') {
+                tspan.setAttribute('letter-spacing', '0em');
+                fixCount++;
+              }
+              if (tspan.parentElement && tspan.parentElement.tagName === 'tspan') {
+                const parentLs = tspan.parentElement.getAttribute('letter-spacing');
+                if (parentLs === '0.06em') {
+                  tspan.parentElement.setAttribute('letter-spacing', '0em');
+                  fixCount++;
+                }
+              }
+            }
+            const parentLs = textEl.getAttribute('letter-spacing');
+            if (parentLs === '0.06em') {
+              textEl.setAttribute('letter-spacing', '0em');
+              fixCount++;
+            }
+          }
+          
+          if (override.segmentLs) {
+            let segIdx = 0;
+            for (const tspan of lineTspans) {
+              if (segIdx < override.segmentLs.length) {
+                const newLs = override.segmentLs[segIdx];
+                tspan.setAttribute('letter-spacing', `${newLs}em`);
+                fixCount++;
+                segIdx++;
+              }
+            }
+            if (segIdx === 0 && override.segmentLs[0] !== undefined) {
+              textEl.setAttribute('letter-spacing', `${override.segmentLs[0]}em`);
+              fixCount++;
+            }
+          }
+        }
+      }
+      
+      if (fixCount === 0) {
+        info.textContent = 'No changes made (patterns not found)';
+        return;
+      }
+      
+      const serializer = new XMLSerializer();
+      const fixedSvg = serializer.serializeToString(doc);
+      
+      try {
+        const svgFileName = currentConfig.filePattern.replace('{num}', currentPoemNum);
+        const res = await fetch('/save-svg', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: svgFileName, content: fixedSvg })
+        });
+        const result = await res.json();
+        if (result.ok) {
+          info.textContent = `SVG fixed and saved! (${fixCount} changes)`;
+          lineOverrides = {};
+          blockOffsets = {};
+          selectedBlockIndex = -1;
+          const allOverrides = JSON.parse(localStorage.getItem('svgEditorLineOverrides') || '{}');
+          delete allOverrides[currentPoemNum];
+          localStorage.setItem('svgEditorLineOverrides', JSON.stringify(allOverrides));
+          setTimeout(() => loadPoem(currentPoemNum), 200);
+        } else {
+          info.textContent = `Save failed: ${result.error}`;
+        }
+      } catch (e) {
+        info.textContent = `Server error: ${e.message}. Need a server with /save-svg endpoint.`;
+      }
+    });
+    
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      calibration = { kernScale: 1.0, lsScale: 1.0, lsOffset: 0, baselineOffset: 0, xOffset: 0, spaceScale: 1.0, spaceLs: true, noMirrorKern: false, noMirrorLs: false };
+      document.getElementById('kernScale').value = 1000;
+      document.getElementById('lsScale').value = 1000;
+      document.getElementById('lsOffset').value = 0;
+      document.getElementById('baselineOffset').value = 0;
+      document.getElementById('xOffset').value = 0;
+      document.getElementById('spaceScale').value = 1000;
+      document.getElementById('spaceLs').checked = true;
+      document.getElementById('noMirrorKern').checked = false;
+      document.getElementById('noMirrorLs').checked = false;
+      render();
+    });
+    
+    // ============ STARTUP ============
+    
+    const config = loadConfig();
+    if (config) {
+      hideSetup();
+      init(config);
+    } else {
+      showSetup();
+    }
+  </script>
+</body>
+</html>

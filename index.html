@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Animation - Physics Experiments</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #c9c9c9;
+            font-family: Georgia, serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            font-weight: normal;
+            color: #666;
+            margin-bottom: 60px;
+            letter-spacing: 0.2em;
+            text-transform: lowercase;
+        }
+
+        .experiments {
+            display: flex;
+            flex-direction: row;
+            gap: 60px;
+        }
+
+        .experiments .column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        a {
+            color: #e8e4d9;
+            text-decoration: none;
+            font-size: 1.4rem;
+            padding: 10px 0;
+            transition: color 0.2s;
+        }
+
+        a:hover {
+            color: #fff;
+        }
+
+        .num {
+            color: #444;
+            margin-right: 1em;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>artifacts</h1>
+
+    <nav class="experiments">
+        <div class="column">
+            <a href="artifacts/01-text-crumble/"><span class="num">01</span>Text Crumble</a>
+            <a href="artifacts/02-the-weaver/"><span class="num">02</span>The Weaver</a>
+            <a href="artifacts/03-crystallization/"><span class="num">03</span>Crystallization</a>
+            <a href="artifacts/04-langevin-chaos/"><span class="num">04</span>Langevin Chaos</a>
+        </div>
+        <div class="column">
+            <a href="artifacts/05-neon-flicker/"><span class="num">05</span>Neon Flicker</a>
+            <a href="artifacts/06-psychedelic/"><span class="num">06</span>Psychedelic</a>
+            <a href="artifacts/07-pixel-letters/"><span class="num">07</span>Pixel Letters</a>
+            <a href="artifacts/08-text-morph/"><span class="num">08</span>Text Morph</a>
+        </div>
+        <div class="column">
+            <a href="artifacts/09-thread/"><span class="num">09</span>Thread</a>
+            <a href="artifacts/10-rest/"><span class="num">10</span>Rest</a>
+            <a href="artifacts/11-strach/"><span class="num">11</span>Fear</a>
+            <a href="artifacts/13-cloud/"><span class="num">13</span>Cloud</a>
+        </div>
+    </nav>
+</body>
+</html>

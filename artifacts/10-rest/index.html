@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="scrap-title" content="Neon 769">
+  <title>Rest / Rust</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      background: #0a0a0a;
+      overflow: hidden;
+      overscroll-behavior: none;
+      position: fixed;
+      width: 100%;
+      height: 100%;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    #debug {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      color: #444;
+      font: 11px monospace;
+    }
+    #progress {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      background: #fff;
+      transition: width 0.05s;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <div id="debug">scroll: 0.00</div>
+  <div id="progress"></div>
+
+  <script type="module">
+    import opentype from 'https://esm.sh/opentype.js@1.3.4';
+
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const debug = document.getElementById('debug');
+    const progress = document.getElementById('progress');
+
+    const LINE1_TEXT = 'Shall we rest';
+    const LINE2_TEXT = 'Shall we rust';
+
+    let font = null;
+    let scrollProgress = 0;
+    window.scrollProgress = 0;
+
+    // Per-letter pixel data
+    // letters[i] = { pixels1: [...], pixels2: [...], flickering: false, flickerPhase: 0 }
+    let letters = [];
+    let flickerTime = 0;
+
+    // ============ PIXEL EXTRACTION ============
+
+    function extractPixels(path, bounds, resolution = 1.5, skip = 1) {
+      const padding = 5;
+      const scale = resolution;
+      const w = Math.ceil((bounds.width + padding * 2) * scale);
+      const h = Math.ceil((bounds.height + padding * 2) * scale);
+
+      if (w <= 0 || h <= 0) return [];
+
+      const offscreen = document.createElement('canvas');
+      offscreen.width = w;
+      offscreen.height = h;
+      const offCtx = offscreen.getContext('2d');
+
+      offCtx.scale(scale, scale);
+      offCtx.translate(-bounds.x1 + padding, -bounds.y1 + padding);
+
+      offCtx.beginPath();
+      for (const cmd of path.commands) {
+        switch (cmd.type) {
+          case 'M': offCtx.moveTo(cmd.x, cmd.y); break;
+          case 'L': offCtx.lineTo(cmd.x, cmd.y); break;
+          case 'Q': offCtx.quadraticCurveTo(cmd.x1, cmd.y1, cmd.x, cmd.y); break;
+          case 'C': offCtx.bezierCurveTo(cmd.x1, cmd.y1, cmd.x2, cmd.y2, cmd.x, cmd.y); break;
+          case 'Z': offCtx.closePath(); break;
+        }
+      }
+      offCtx.fillStyle = '#fff';
+      offCtx.fill();
+
+      const imageData = offCtx.getImageData(0, 0, w, h);
+      const extracted = [];
+
+      for (let py = 0; py < h; py += skip) {
+        for (let px = 0; px < w; px += skip) {
+          const i = (py * w + px) * 4;
+          const alpha = imageData.data[i + 3];
+          if (alpha > 128) {
+            extracted.push({
+              x: bounds.x1 - padding + px / scale,
+              y: bounds.y1 - padding + py / scale
+            });
+          }
+        }
+      }
+
+      return extracted;
+    }
+
+    function getPathBounds(path) {
+      let x1 = Infinity, y1 = Infinity, x2 = -Infinity, y2 = -Infinity;
+      for (const cmd of path.commands) {
+        if (cmd.x !== undefined) {
+          x1 = Math.min(x1, cmd.x);
+          x2 = Math.max(x2, cmd.x);
+          y1 = Math.min(y1, cmd.y);
+          y2 = Math.max(y2, cmd.y);
+        }
+      }
+      return { x1, y1, x2, y2, width: x2 - x1, height: y2 - y1 };
+    }
+
+    // ============ INIT ============
+
+    function initPixels() {
+      if (!font) return;
+
+      const fontSize = 72;
+      letters = [];
+
+      // Get full text bounds for centering
+      const fullPath = font.getPath(LINE1_TEXT, 0, 0, fontSize);
+      const fullBounds = getPathBounds(fullPath);
+
+      const offsetX = (canvas.width - fullBounds.width) / 2 - fullBounds.x1;
+      const offsetY = canvas.height / 2 - fullBounds.height / 2 - fullBounds.y1;
+
+      // Extract per-letter
+      let x1 = 0, x2 = 0;
+      for (let i = 0; i < LINE1_TEXT.length; i++) {
+        const char1 = LINE1_TEXT[i];
+        const char2 = LINE2_TEXT[i];
+
+        // Get letter paths at their positions
+        const path1 = font.getPath(char1, x1, 0, fontSize);
+        const path2 = font.getPath(char2, x2, 0, fontSize);
+
+        const bounds1 = getPathBounds(path1);
+        const bounds2 = getPathBounds(path2);
+
+        const pixels1 = extractPixels(path1, bounds1).map(p => ({
+          x: p.x + offsetX,
+          y: p.y + offsetY
+        }));
+
+        const pixels2 = extractPixels(path2, bounds2).map(p => ({
+          x: p.x + offsetX,
+          y: p.y + offsetY
+        }));
+
+        letters.push({
+          char1,
+          char2,
+          pixels1,
+          pixels2,
+          // Each letter has its own flicker state
+          flickerSeed: Math.random() * 1000,
+          swapped: false
+        });
+
+        // Advance x position
+        const glyph1 = font.charToGlyph(char1);
+        const glyph2 = font.charToGlyph(char2);
+        x1 += glyph1.advanceWidth * (fontSize / font.unitsPerEm);
+        x2 += glyph2.advanceWidth * (fontSize / font.unitsPerEm);
+      }
+
+      console.log(`Extracted ${letters.length} letters`);
+    }
+
+    // ============ RENDER ============
+
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      flickerTime += 1;
+
+      const s = scrollProgress;
+
+      // Flicker intensity: 0 at edges, peaks at 0.5
+      // Wider curve with longer tails
+      const flickerIntensity = Math.pow(Math.sin(s * Math.PI), 0.6);
+
+      // Swap threshold - swap happens around 0.5
+      const swapPoint = 0.5;
+
+      for (let i = 0; i < letters.length; i++) {
+        const letter = letters[i];
+        const seed = letter.flickerSeed;
+
+        // Determine if this letter is swapped yet
+        // Stagger the swap slightly per letter
+        const letterSwapPoint = swapPoint + (Math.sin(seed) * 0.1);
+        const showLine2 = s > letterSwapPoint;
+
+        const pixels = showLine2 ? letter.pixels2 : letter.pixels1;
+
+        // Calculate letter-specific flicker
+        // More intense flicker near the swap point
+        const distFromSwap = Math.abs(s - letterSwapPoint);
+        const letterFlickerIntensity = Math.max(0, 1 - distFromSwap * 4) * flickerIntensity;
+
+        // Time-based flicker with per-letter phase offset
+        const flickerWave = Math.sin(flickerTime * 0.2 + seed) *
+                           Math.sin(flickerTime * 0.37 + seed * 2);
+
+        // Determine visibility and alpha
+        let visible = true;
+        let alpha = 1;
+
+        if (letterFlickerIntensity > 0.02) {
+          // Random blink chance - much more aggressive
+          const blinkChance = letterFlickerIntensity * 0.7;
+          if (Math.random() < blinkChance) {
+            visible = Math.random() > letterFlickerIntensity * 0.6;
+          }
+
+          // Alpha modulation - amplitude scales with intensity
+          const baseAlpha = 1 - letterFlickerIntensity * 0.6;
+          const amplitude = letterFlickerIntensity * 0.8;
+          alpha = baseAlpha + flickerWave * amplitude + (Math.random() - 0.5) * amplitude;
+          alpha = Math.max(0, Math.min(1, alpha));
+        }
+
+        if (visible && pixels.length > 0) {
+          ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+          for (const p of pixels) {
+            ctx.fillRect(p.x, p.y, 1, 1);
+          }
+        }
+      }
+
+      debug.textContent = `scroll: ${s.toFixed(2)} flicker: ${flickerIntensity.toFixed(2)}`;
+      progress.style.width = `${s * 100}%`;
+
+      requestAnimationFrame(render);
+    }
+
+    // ============ SCROLL HANDLING ============
+
+    window.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      scrollProgress += e.deltaY * 0.0008;
+      scrollProgress = Math.max(0, Math.min(1, scrollProgress));
+      window.scrollProgress = scrollProgress;
+    }, { passive: false });
+
+    // ============ RESIZE ============
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      if (font) initPixels();
+    }
+
+    window.addEventListener('resize', resize);
+
+    // ============ INIT ============
+
+    async function init() {
+      resize();
+      try {
+        font = await opentype.load('../../materials/fonts/ADolphin-Roman.otf');
+        initPixels();
+        render();
+      } catch (e) {
+        console.error('Font load error:', e);
+        debug.textContent = 'Font error: ' + e.message;
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

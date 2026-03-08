@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="scrap-title" content="Langevin 710">
+  <title>Hold This Thread</title>
+  <style>
+    @font-face {
+      font-family: 'ADolphin';
+      src: url('../../materials/fonts/ADolphin-Roman.otf') format('opentype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      position: fixed;
+      width: 100%;
+      background: #0a0a0a;
+      font-family: 'ADolphin', Georgia, serif;
+      color: #e8e4d9;
+      overscroll-behavior: none;
+    }
+
+    .text-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .letter {
+      position: fixed;
+      left: 0;
+      top: 0;
+      font-size: 48px;
+      transition: none;
+      will-change: transform, opacity;
+      pointer-events: none;
+    }
+
+    .debug {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      color: #666;
+      font-family: monospace;
+      font-size: 12px;
+      z-index: 1000;
+    }
+
+    #progress {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      background: #fff;
+      transition: width 0.05s;
+    }
+  </style>
+</head>
+<body>
+  <div class="text-container" id="container"></div>
+  <div class="debug" id="debug">T: 0 | scroll: 0%</div>
+  <div id="progress"></div>
+
+  <script>
+    const TEXT = 'old this thread';
+    const FULL_TEXT = 'Hold this thread';
+
+    // Langevin dynamics constants (from 04)
+    const TEMPERATURE_MAX = 0.3;
+    const TEMPERATURE_MIN = 0.001;
+    const DAMPING = 0.35;
+    const WELL_STRENGTH_MAX = 0.18;
+    const WELL_STRENGTH_MIN = 0.001;
+    const REPULSION_STRENGTH = 200;
+    const REPULSION_RANGE = 60;
+    const DT = 1.0;
+
+    // Phase timing
+    const PHASE = {
+      DRIFT_START: 0.15,
+      DRIFT_END: 0.35,
+      S_FADE_START: 0.32,
+      S_FADE_END: 0.52,
+      S_DROP_START: 0.50,
+      S_DROP_END: 0.68,
+      S_SHAKE_START: 0.82,
+      S_SHAKE_END: 0.86,
+      S_FALL_START: 0.86,
+      S_FALL_END: 1.0
+    };
+
+    let letters = [];
+    let sLetter = null;  // The special "S"
+    let centerX, centerY;
+    let temperature = TEMPERATURE_MIN;
+    let scrollProgress = 0;
+    window.scrollProgress = 0;
+    let frameTime = 0;  // For shake oscillation
+    let pausedAtLanding = false;  // Pause when S lands
+    let shakeTriggered = false;   // Full shake from space tap
+    let autoFalling = false;      // Auto-animate fall on second space
+    let autoFallStart = 0;        // Timestamp when auto-fall began
+
+    // Positions for "Svaž si mě" layout
+    let sStartX, sStartY;  // Above shadow position
+    let sTargetX, sTargetY;  // Final position in "Svaž"
+
+    // S shake/fall parameters (from text-crumble)
+    const S_SHAKE = {
+      freqX: 45,
+      freqY: 55,
+      ampX: 1.5,
+      ampY: 1,
+      phase: Math.random() * Math.PI * 2
+    };
+    const S_FALL = {
+      rotation: (Math.random() - 0.5) * 400,  // random spin
+      fallY: 250,
+      fallX: (Math.random() - 0.5) * 40
+    };
+
+    // Box-Muller for gaussian random
+    function gaussianRandom() {
+      let u = 0, v = 0;
+      while (u === 0) u = Math.random();
+      while (v === 0) v = Math.random();
+      return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+    }
+
+    class Letter {
+      constructor(char, targetX, targetY, index, total, isSpecialS = false) {
+        this.char = char;
+        this.targetX = targetX;
+        this.targetY = targetY;
+        this.index = index;
+        this.total = total;
+        this.isSpecialS = isSpecialS;
+
+        // Start at target position (special S starts at shadow position)
+        this.x = targetX;
+        this.y = targetY;
+        this.vx = 0;
+        this.vy = 0;
+        this.ax = 0;
+        this.ay = 0;
+
+        this.opacity = isSpecialS ? 0 : 1;
+        this.baseOpacity = 0.1 + Math.random() * 0.3;
+        this.effectiveTemp = TEMPERATURE_MIN;
+
+        // For special S: track if it's joined the physics system
+        this.joinedPhysics = !isSpecialS;
+
+        // Create DOM element
+        this.el = document.createElement('span');
+        this.el.className = 'letter';
+        this.el.textContent = char;
+        document.getElementById('container').appendChild(this.el);
+      }
+
+      computeForces(allLetters, globalTemp) {
+        let fx = 0, fy = 0;
+
+        // Store effective temp
+        this.effectiveTemp = globalTemp;
+
+        // Well strength: stronger when cold, weaker when hot
+        const tempRatio = globalTemp / TEMPERATURE_MAX;
+        const wellStrength = WELL_STRENGTH_MAX * (1 - tempRatio) + WELL_STRENGTH_MIN * tempRatio;
+
+        // Spring force towards target
+        const dx = this.targetX - this.x;
+        const dy = this.targetY - this.y;
+        fx += dx * wellStrength;
+        fy += dy * wellStrength;
+
+        // Inter-letter repulsion (scales with temperature)
+        const repulsionScale = 0.2 + 0.8 * tempRatio;
+
+        for (const other of allLetters) {
+          if (other === this) continue;
+
+          const ox = this.x - other.x;
+          const oy = this.y - other.y;
+          const dist = Math.sqrt(ox * ox + oy * oy);
+
+          if (dist < REPULSION_RANGE && dist > 1) {
+            const force = REPULSION_STRENGTH * repulsionScale / (dist * dist);
+            fx += (ox / dist) * force;
+            fy += (oy / dist) * force;
+          }
+        }
+
+        // Damping: -γv
+        fx -= DAMPING * this.vx;
+        fy -= DAMPING * this.vy;
+
+        // Langevin thermal noise: √(2γkT) * η(t)
+        // X noise biased rightward (only positive), Y noise symmetric
+        const noiseStrength = Math.sqrt(2 * DAMPING * globalTemp);
+        fx += noiseStrength * Math.abs(gaussianRandom()); // rightward only
+        fy += noiseStrength * gaussianRandom();
+
+        return { fx, fy };
+      }
+
+      verletStep1(dt) {
+        this.x += this.vx * dt + 0.5 * this.ax * dt * dt;
+        this.y += this.vy * dt + 0.5 * this.ay * dt * dt;
+        this.vx += 0.5 * this.ax * dt;
+        this.vy += 0.5 * this.ay * dt;
+      }
+
+      verletStep2(allLetters, temp, dt) {
+        const { fx, fy } = this.computeForces(allLetters, temp);
+        this.ax = fx;
+        this.ay = fy;
+        this.vx += 0.5 * this.ax * dt;
+        this.vy += 0.5 * this.ay * dt;
+      }
+
+      updateVisuals() {
+        // Opacity based on distance from target
+        const dx = this.x - this.targetX;
+        const dy = this.y - this.targetY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const distNormalized = Math.min(1, dist / 40);
+
+        // Far = baseOpacity (textured), close = solid
+        const targetOpacity = this.baseOpacity + (1 - distNormalized) * (1 - this.baseOpacity);
+        this.opacity += (targetOpacity - this.opacity) * 0.1;
+      }
+
+      render() {
+        this.el.style.transform = `translate(${this.x}px, ${this.y}px)`;
+        this.el.style.opacity = this.opacity;
+      }
+    }
+
+    function measureLine(text) {
+      const measurer = document.createElement('div');
+      measurer.style.cssText = `
+        position: absolute;
+        visibility: hidden;
+        font-family: 'ADolphin', Georgia, serif;
+        font-size: 48px;
+        white-space: pre;
+      `;
+      document.body.appendChild(measurer);
+
+      measurer.textContent = text;
+      const totalWidth = measurer.getBoundingClientRect().width;
+
+      const positions = [];
+      for (let i = 0; i < text.length; i++) {
+        measurer.textContent = text.substring(0, i);
+        const x = measurer.getBoundingClientRect().width;
+        positions.push({ char: text[i], x });
+      }
+
+      document.body.removeChild(measurer);
+      return { positions, totalWidth };
+    }
+
+    function init() {
+      centerX = window.innerWidth / 2;
+      centerY = window.innerHeight / 2;
+
+      // Measure both layouts
+      const vazLayout = measureLine(TEXT);       // "važ si mě"
+      const svazLayout = measureLine(FULL_TEXT); // "svaž si mě"
+
+      // Center "važ si mě" initially
+      const startX = centerX - vazLayout.totalWidth / 2;
+      const lineY = centerY;
+
+      // Calculate where "svaž si mě" would be centered
+      const svazStartX = centerX - svazLayout.totalWidth / 2;
+
+      // The "s" target position (first char of "svaž si mě")
+      sTargetX = svazStartX + svazLayout.positions[0].x;
+      sTargetY = lineY;
+
+      // The "S" start position - directly above where it will land
+      sStartX = sTargetX;
+      sStartY = lineY - 100;
+
+      // Create regular letters for "važ si mě"
+      // Position them where they'll be in "Svaž si mě" from the start (no shift on loop)
+      const totalChars = TEXT.replace(/ /g, '').length + 1; // +1 for the s
+      let charIndex = 1; // Start at 1, s will be 0
+
+      for (let i = 0; i < TEXT.length; i++) {
+        const char = TEXT[i];
+        if (char === ' ') continue;
+
+        // Use "Svaž" positions from the start - text stays put, only S comes and goes
+        const targetX = svazStartX + svazLayout.positions[i + 1].x; // +1 because s is prepended
+
+        const letter = new Letter(char, targetX, lineY, charIndex++, totalChars);
+        letter.originalTargetX = targetX;  // Same position throughout
+        letter.shiftedTargetX = targetX;   // No shift needed
+        letters.push(letter);
+      }
+
+      // Create the special "S" - starts at shadow position, invisible
+      sLetter = new Letter('S', sStartX, sStartY, 0, totalChars, true);
+      sLetter.shiftedTargetX = sTargetX;
+      sLetter.shiftedTargetY = sTargetY;
+
+      animate();
+    }
+
+    const AUTO_FALL_DURATION = 1200;  // ms for auto-fall animation
+
+    function animate() {
+      frameTime = performance.now();
+
+      // Auto-fall animation
+      if (autoFalling) {
+        const elapsed = frameTime - autoFallStart;
+        const t = Math.min(1, elapsed / AUTO_FALL_DURATION);
+        scrollProgress = PHASE.S_FALL_START + (PHASE.S_FALL_END - PHASE.S_FALL_START) * easeInQuad(t);
+        window.scrollProgress = scrollProgress;
+
+        // When done, reset
+        if (t >= 1) {
+          resetToStart();
+        }
+      }
+
+      const s = scrollProgress;
+
+      // === PHASE 1-2: Temperature control ===
+      // 0.0-0.15: cold (locked)
+      // 0.15-0.35: heating up (drift)
+      // 0.35-0.50: stay hot (s fading in)
+      // 0.50-0.65: cooling down (s dropping, everything locks)
+      // 0.65+: cold (locked as "svaž si mě")
+
+      if (s < PHASE.DRIFT_START) {
+        temperature = TEMPERATURE_MIN;
+      } else if (s < PHASE.DRIFT_END) {
+        const t = (s - PHASE.DRIFT_START) / (PHASE.DRIFT_END - PHASE.DRIFT_START);
+        temperature = TEMPERATURE_MIN + (TEMPERATURE_MAX - TEMPERATURE_MIN) * Math.pow(t, 2);
+      } else if (s < PHASE.S_DROP_START) {
+        temperature = TEMPERATURE_MAX;
+      } else if (s < PHASE.S_DROP_END) {
+        const t = (s - PHASE.S_DROP_START) / (PHASE.S_DROP_END - PHASE.S_DROP_START);
+        temperature = TEMPERATURE_MAX - (TEMPERATURE_MAX - TEMPERATURE_MIN) * Math.pow(t, 2);
+      } else {
+        temperature = TEMPERATURE_MIN;
+      }
+
+      // === PHASE 3: S fades in ===
+      if (s >= PHASE.S_FADE_START && s < PHASE.S_FADE_END) {
+        const t = (s - PHASE.S_FADE_START) / (PHASE.S_FADE_END - PHASE.S_FADE_START);
+        sLetter.opacity = t;
+      } else if (s >= PHASE.S_FADE_END) {
+        sLetter.opacity = 1;
+      } else {
+        sLetter.opacity = 0;
+      }
+
+      // === PHASE 4: S drops ===
+      if (s >= PHASE.S_DROP_START) {
+        const t = Math.min(1, (s - PHASE.S_DROP_START) / (PHASE.S_DROP_END - PHASE.S_DROP_START));
+        // Gravity easing: accelerates down, then dampens at end (heavy object settling)
+        const dropEased = easeInOutQuad(t);
+
+        // S drops straight down - gravity feel
+        if (!sLetter.joinedPhysics) {
+          sLetter.x = sStartX; // stays aligned
+          sLetter.y = sStartY + (sTargetY - sStartY) * dropEased;
+
+          // Once fully dropped, join physics
+          if (t >= 1) {
+            sLetter.joinedPhysics = true;
+            sLetter.targetX = sTargetX;
+            sLetter.targetY = sTargetY;
+            sLetter.x = sTargetX;
+            sLetter.y = sTargetY;
+            sLetter.vx = 0;
+            sLetter.vy = 0;
+          }
+        }
+      }
+
+      // === PHASE 5: S shakes ===
+      let sShakeX = 0, sShakeY = 0, sRotation = 0, sFalling = false;
+
+      if (s >= PHASE.S_SHAKE_START && s < PHASE.S_FALL_START) {
+        // Full intensity if triggered by space, otherwise ramp up
+        const intensity = shakeTriggered ? 1 : easeInQuad(Math.min(1, (s - PHASE.S_SHAKE_START) / (PHASE.S_SHAKE_END - PHASE.S_SHAKE_START)));
+
+        sShakeX = Math.sin(frameTime * 0.001 * S_SHAKE.freqX + S_SHAKE.phase) * S_SHAKE.ampX * intensity;
+        sShakeY = Math.sin(frameTime * 0.001 * S_SHAKE.freqY + S_SHAKE.phase) * S_SHAKE.ampY * intensity;
+        sRotation = Math.sin(frameTime * 0.001 * 12 + S_SHAKE.phase) * 2 * intensity;
+      }
+
+      // === PHASE 6: S falls ===
+      if (s >= PHASE.S_FALL_START) {
+        sFalling = true;
+        const t = (s - PHASE.S_FALL_START) / (PHASE.S_FALL_END - PHASE.S_FALL_START);
+        const fallT = easeInQuad(Math.min(1, t));
+
+        // Continue shake at full intensity during fall
+        sShakeX = Math.sin(frameTime * 0.001 * S_SHAKE.freqX + S_SHAKE.phase) * S_SHAKE.ampX;
+        sShakeY = Math.sin(frameTime * 0.001 * S_SHAKE.freqY + S_SHAKE.phase) * S_SHAKE.ampY;
+
+        // Add fall displacement
+        sShakeX += S_FALL.fallX * fallT;
+        sShakeY += S_FALL.fallY * fallT;
+        sRotation = S_FALL.rotation * fallT;
+
+        // Fade out
+        sLetter.opacity = 1 - fallT;
+      }
+
+      // === Physics step ===
+      // S excluded from physics during shake/fall
+      const sInPhysics = sLetter.joinedPhysics && s < PHASE.S_SHAKE_START;
+      const physicsLetters = sInPhysics ? [sLetter, ...letters] : letters;
+
+      physicsLetters.forEach(l => l.verletStep1(DT));
+      physicsLetters.forEach(l => l.verletStep2(physicsLetters, temperature, DT));
+      physicsLetters.forEach(l => {
+        l.updateVisuals();
+        l.render();
+      });
+
+      // Render S with shake/fall transforms
+      if (!sInPhysics || s >= PHASE.S_SHAKE_START) {
+        const baseX = sLetter.joinedPhysics ? sLetter.targetX : sLetter.x;
+        const baseY = sLetter.joinedPhysics ? sLetter.targetY : sLetter.y;
+        sLetter.el.style.transform = `translate(${baseX + sShakeX}px, ${baseY + sShakeY}px) rotate(${sRotation}deg)`;
+        sLetter.el.style.opacity = sLetter.opacity;
+      }
+
+      // Debug
+      const phase = s < PHASE.DRIFT_START ? 'locked' :
+                    s < PHASE.DRIFT_END ? 'drift' :
+                    s < PHASE.S_FADE_END ? 's-fade' :
+                    s < PHASE.S_DROP_END ? 's-drop' :
+                    s < PHASE.S_SHAKE_START ? 'locked-svaz' :
+                    s < PHASE.S_FALL_START ? 's-shake' : 's-fall';
+      document.getElementById('debug').textContent =
+        `T: ${temperature.toFixed(3)} | scroll: ${(s * 100).toFixed(1)}% | ${phase}`;
+      document.getElementById('progress').style.width = `${s * 100}%`;
+
+      requestAnimationFrame(animate);
+    }
+
+    function easeOutCubic(t) {
+      return 1 - Math.pow(1 - t, 3);
+    }
+
+    function easeInOutQuad(t) {
+      // Accelerates then decelerates - like gravity with damping
+      return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    }
+
+    function easeInQuad(t) {
+      return t * t;
+    }
+
+    function resetToStart() {
+      scrollProgress = 0;
+      window.scrollProgress = 0;
+      pausedAtLanding = false;
+      shakeTriggered = false;
+      autoFalling = false;
+
+      // Reset S to shadow position
+      sLetter.x = sStartX;
+      sLetter.y = sStartY;
+      sLetter.vx = 0;
+      sLetter.vy = 0;
+      sLetter.opacity = 0;
+      sLetter.joinedPhysics = false;
+
+      // Reset letters to original "važ si mě" positions
+      letters.forEach(l => {
+        l.targetX = l.originalTargetX;
+        l.x = l.originalTargetX;
+        l.y = l.targetY;
+        l.vx = 0;
+        l.vy = 0;
+      });
+    }
+
+    window.addEventListener('wheel', (e) => {
+      e.preventDefault();
+
+      // If paused at landing, ignore scroll
+      if (pausedAtLanding) return;
+
+      const prevProgress = scrollProgress;
+      scrollProgress += e.deltaY * 0.0005;
+
+      // Pause when S lands (crossing S_DROP_END threshold)
+      if (prevProgress < PHASE.S_DROP_END && scrollProgress >= PHASE.S_DROP_END) {
+        scrollProgress = PHASE.S_DROP_END;
+        pausedAtLanding = true;
+      }
+
+      // Loop: reset when reaching the end
+      if (scrollProgress >= 1) {
+        resetToStart();
+      }
+      scrollProgress = Math.max(0, Math.min(1, scrollProgress));
+      window.scrollProgress = scrollProgress;
+    }, { passive: false });
+
+    // Space to unpause - jump straight to shake at full intensity
+    // Second space triggers auto-fall
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+
+        if (pausedAtLanding) {
+          // First space: unpause and start shake
+          pausedAtLanding = false;
+          shakeTriggered = true;
+          scrollProgress = PHASE.S_SHAKE_START;
+          window.scrollProgress = scrollProgress;
+        } else if (shakeTriggered && !autoFalling && scrollProgress >= PHASE.S_SHAKE_START && scrollProgress < PHASE.S_FALL_END) {
+          // Second space during shake: trigger auto-fall
+          autoFalling = true;
+          autoFallStart = performance.now();
+          scrollProgress = PHASE.S_FALL_START;
+          window.scrollProgress = scrollProgress;
+        }
+      }
+    });
+
+    document.fonts.ready.then(() => {
+      init();
+    });
+  </script>
+</body>
+</html>
