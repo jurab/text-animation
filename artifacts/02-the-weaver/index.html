@@ -13,7 +13,7 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body {
-            background: #0a0a0a;
+            background: #000;
             color: #c9c9c9;
             font-family: 'ADolphin', Georgia, serif;
             font-size: 24px;
@@ -174,7 +174,7 @@
         function tick() {
             const scrollY = window.scrollY;
             const maxScroll = document.body.scrollHeight - window.innerHeight;
-            const scrollProgress = scrollY / maxScroll;
+            const scrollProgress = 0.05 + (scrollY / maxScroll) * 0.95;
             
             const viewportH = window.innerHeight;
             

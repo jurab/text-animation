@@ -19,12 +19,13 @@
         
         html {
             height: 100%;
+            background: #000;
         }
-        
+
         body {
             min-height: 100%;
             overflow-x: hidden;
-            background: #0a0a0a;
+            background: #000;
             font-family: 'ADolphin', Georgia, serif;
             color: #e8e4d9;
         }
@@ -99,9 +100,7 @@
         let centerX, centerY;
         let scrollProgress = 0;
         let lastScrollProgress = 0;
-        let fadeInProgress = 0;
-        const FADE_IN_DELAY = 3000;  // ms before fade starts
-        const FADE_IN_DURATION = 2000;  // ms
+        let fadeInProgress = 1;
         const SETTLE_THRESHOLD = 0.5;  // velocity below this = settled
         let startTime = null;
         
@@ -345,10 +344,6 @@
             
             // Animation loop
             function animate(timestamp) {
-                if (!startTime) startTime = timestamp;
-                const elapsed = timestamp - startTime;
-                const fadeElapsed = Math.max(0, elapsed - FADE_IN_DELAY);
-                fadeInProgress = Math.min(1, fadeElapsed / FADE_IN_DURATION);
                 
                 const scrollDelta = scrollProgress - lastScrollProgress;
                 lastScrollProgress = scrollProgress;

@@ -108,21 +108,21 @@ agreement`
             beatCount = currentBeat;
             lastBeatTime = now;
 
-            // Every beat: flash (dip) + drift
-            flashIntensity = 0.85; // strong opacity dip
-            driftAngle += Math.PI / 2; // rotate 90° each beat
-            driftIntensity = 6;
+            // // Every beat: flash (dip) + drift
+            // flashIntensity = 0.85;
+            // driftAngle += Math.PI / 2;
+            // driftIntensity = 6;
 
-            // Every 4th beat: attraction invert
-            if (beatCount % 4 === 0) {
-                attractionInvert = 1.5;
-                driftIntensity = 12; // bigger drift on the one
-            }
+            // // Every 4th beat: attraction invert
+            // if (beatCount % 4 === 0) {
+            //     attractionInvert = 1.5;
+            //     driftIntensity = 12;
+            // }
 
-            // Every 16th beat: scale pulse
-            if (beatCount % 16 === 0) {
-                scalePulse = 1.0; // 100% scale increase (double)
-            }
+            // // Every 16th beat: scale pulse
+            // if (beatCount % 16 === 0) {
+            //     scalePulse = 1.0;
+            // }
         }
 
         // Decay effects

@@ -27,12 +27,13 @@
 
         html {
             height: 100%;
+            background: #000;
         }
 
         body {
             min-height: 100%;
             overflow-x: hidden;
-            background: #0a0a0a;
+            background: #000;
             font-family: 'ADolphin', Georgia, serif;
             color: #e8e4d9;
         }
@@ -137,9 +138,7 @@
         let centerX, centerY;
         let temperature = TEMPERATURE_MAX;
         let scrollProgress = 0;
-        let fadeInProgress = 0;
-        const FADE_IN_DELAY = 2000;
-        const FADE_IN_DURATION = 1500;
+        let fadeInProgress = 1;
         const SETTLE_THRESHOLD = 0.3;
         let startTime = null;
         let frameCount = 0;
@@ -499,11 +498,7 @@
             // No manual scatter needed, the physics does it naturally
 
             function animate(timestamp) {
-                if (!startTime) startTime = timestamp;
                 frameCount++;
-                const elapsed = timestamp - startTime;
-                const fadeElapsed = Math.max(0, elapsed - FADE_IN_DELAY);
-                fadeInProgress = Math.min(1, fadeElapsed / FADE_IN_DURATION);
 
                 // Temperature from scroll: top = hot, bottom = cold
                 // Use exponential curve for more interesting transition dynamics

@@ -16,8 +16,9 @@
       box-sizing: border-box;
     }
 
+    html { background: #000; }
     body {
-      background: #0a0a0a;
+      background: #000;
       color: #f0f0f0;
       min-height: 400vh;
       font-family: 'ADolphin', Georgia, serif;
@@ -123,7 +124,7 @@
 
     function getScrollProgress() {
       const maxScroll = document.body.scrollHeight - window.innerHeight;
-      return Math.min(1, Math.max(0, window.scrollY / maxScroll));
+      return 0.05 + (window.scrollY / maxScroll) * 0.95;
     }
 
     function animate() {
